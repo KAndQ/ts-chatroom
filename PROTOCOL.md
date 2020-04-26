@@ -1,6 +1,6 @@
 # PROTOCOL
 
-使用 TypeScript 语法作为协议定义描述语言.
+使用 TypeScript 作为协议数据定义描述语言.
 
 ## I. Data Struct
 
