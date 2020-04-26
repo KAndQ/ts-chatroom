@@ -11,8 +11,8 @@
 
 ## 二、介绍
 
-[Client](./capp/README.md)
-[Server](./sapp/README.md)
+* [Client](./capp/README.md)
+* [Server](./sapp/README.md)
 
 ## 三、项目基础功能
 
