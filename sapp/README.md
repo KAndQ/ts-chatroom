@@ -9,7 +9,7 @@
 ## TODOLIST
 
 -   [x] Socket 网关
--   [ ] WebSocket 网关
+-   [ ] Socket.IO 网关
 -   [ ] Http 网关
 -   [ ] 文件上传
 -   [ ] 图片上传
