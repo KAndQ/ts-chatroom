@@ -6,3 +6,4 @@
 * Ant Design
 * React Redux
 * React Router
+* Socket.IO
