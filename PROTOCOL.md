@@ -148,3 +148,28 @@ interface ResponsePullMessages {
 ### 上传图片 uploadImage
 
 使用 http 协议上传图片, 返回图片的下载地址
+
+### 请求在线用户列表 getOnlineUserList
+
+```TypeScript
+interface RequestGetOnlineUserList {
+}
+
+interface ResponseGetOnlineUserList {
+    chatUsers: ChatUser[];
+}
+```
+
+### 用户上线/下线推送 pushChatUserStatus
+
+```TypeScript
+enum Status {
+    ONLINE,
+    OFFLINE,
+}
+
+interface RequestPushChatUserStatus {
+    chatUser: ChatUser;
+    status: Status;
+}
+```
