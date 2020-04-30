@@ -8,6 +8,7 @@ import core from "./Core";
 import { EVENT_RECV_DATA, EVENT_CONNECT_CLOSE } from "./Events";
 import SocketClient from "../socket/Client";
 import ChatUser from "./ChatUser";
+import Dev from "../utils/Dev";
 
 type Client = SocketClient;
 
@@ -70,12 +71,12 @@ export default class ChatRoom {
                         break;
                 }
             } catch (e) {
-                console.log(e);
+                Dev.print("Chat Room Error", e.toString());
             }
         });
 
         core.on(EVENT_CONNECT_CLOSE, (client: Client) => {
-            console.log(EVENT_CONNECT_CLOSE);
+            Dev.print("Chat Room", "connect close");
         });
     }
 
@@ -99,4 +100,6 @@ export default class ChatRoom {
 
     private m_users: ChatUser[] = [];
     private m_id2Users: Map<string, ChatUser> = new Map();
+    private m_roomName: string = "";
+    private m_roomId: number = 0;
 }

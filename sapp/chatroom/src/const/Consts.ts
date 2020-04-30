@@ -4,4 +4,7 @@
  * @date 2020.04.27
  */
 
-export const PORT = 48080;
+export const SOCKET_PORT = 48080;
+export const SOCKET_IO_PORT = 48081;
+export const HTTP_PORT = 48082;
+export const WEB_SOCKET = 48083;

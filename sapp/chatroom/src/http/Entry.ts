@@ -4,11 +4,13 @@
  * @date 2020.04.27
  */
 
+import Dev from "../utils/Dev";
+
 export default class Entry {
     public constructor() {
     }
 
     public run(): void {
-        console.log("Http Entry run");
+        Dev.print("Http Server Entry", "run");
     }
 }

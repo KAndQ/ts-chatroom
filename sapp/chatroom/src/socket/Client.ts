@@ -7,31 +7,39 @@
 import { Socket } from "net";
 import core from "../core/Core";
 import { EVENT_RECV_DATA } from "../core/Events";
+import IClient from "../interface/IClient";
+import Dev from "../utils/Dev";
 
 const HEAD_SIZE = 4;
 let gen_id = 0;
 
-export default class Client {
+export default class Client implements IClient {
     public constructor(socket: Socket, closeListener?: (client: Client) => void) {
         this.m_socket = socket;
         this.m_closeListener = closeListener;
         this.m_id = "Socket: " + ++gen_id;
     }
 
-    public get socket() {
-        return this.m_socket;
+    public get clientId() {
+        return this.m_id;
     }
 
     public run() {
         let handle = setInterval(() => {
             while (this.m_queue.length > 0) {
-                let data = this.m_queue.splice(0, 1)[0];
-                core.emit(EVENT_RECV_DATA, data.toString(), this);
+                const data = this.m_queue.splice(0, 1)[0];
+                const s = data.toString();
+                if (s === "ping") {
+                    Dev.print("Socket Server Client Recv", "PING");
+                    this.pong();
+                } else {
+                    core.emit(EVENT_RECV_DATA, data.toString(), this);
+                }
             }
         }, 0);
 
         this.m_socket.on("close", (had_error) => {
-            console.log("[CLIENT CLOSE], had_error =", had_error);
+            Dev.print("Socket Server Client Close", "had_error = " + had_error);
             clearInterval(handle);
 
             if (this.m_closeListener) {
@@ -42,10 +50,10 @@ export default class Client {
             this.decode(data);
         });
         this.m_socket.on("error", (err) => {
-            console.log("[CLIENT ERROR] " + err);
+            Dev.print("Socket Server Client Error", err.toString());
         });
         this.m_socket.on("timeout", () => {
-            console.log("[CLIENT TIMEOUT]");
+            Dev.print("Socket Server Client Timeout");
         });
     }
 
@@ -53,6 +61,14 @@ export default class Client {
         let headBuf = Buffer.alloc(HEAD_SIZE);
         headBuf.writeUInt32BE(data.length);
         this.m_socket.write(Buffer.concat([headBuf, data]));
+    }
+
+    public sendBuffer(buf: Buffer): void {
+        this.encodeSend(buf);
+    }
+
+    public sendString(s: string): void {
+        this.encodeSend(Buffer.from(s));
     }
 
     public decode(data: Buffer): void {
@@ -84,6 +100,7 @@ export default class Client {
 
     public pong(): void {
         this.encodeSend(Buffer.from("pong"));
+        Dev.print("Socket Server Client Send", "PONG");
     }
 
     private m_socket: Socket;

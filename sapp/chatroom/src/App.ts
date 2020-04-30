@@ -5,14 +5,16 @@
  */
 
 import socketEntry from "./socket/Entry";
+import socketIOEntry from "./socketio/Entry";
 import core from "./core/Core";
+import Dev from "./utils/Dev";
 
 export default class App {
     public run(): void {
-        console.log("Run! Fast Run! Gump!");
-
+        Dev.print("App", "Run! Fast Run! Gump!");
         core.init();
         socketEntry.run();
+        socketIOEntry.run();
     }
 }
 

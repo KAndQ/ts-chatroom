@@ -5,10 +5,11 @@
  */
 
 import { Server, createServer } from "net";
-import { PORT } from "../const/Consts";
+import { SOCKET_PORT } from "../const/Consts";
 import Client from "./Client";
 import core from "../core/Core";
 import { EVENT_CONNECT_CLOSE } from "../core/Events";
+import Dev from "../utils/Dev";
 
 export class Entry {
     /**
@@ -26,16 +27,16 @@ export class Entry {
     }
 
     public run(): void {
-        console.log("Socket entry run");
+        Dev.print("Socket Entry", "run");
 
         this.m_server = createServer(sock => {
-            console.log("[SERVER CONNECT]");
+            Dev.print("Socket Server", "CONNECT");
             const client = new Client(sock, client => {
                 core.emit(EVENT_CONNECT_CLOSE, client);
             });
             client.run();
         });
-        this.m_server.listen(PORT);
+        this.m_server.listen(SOCKET_PORT);
     }
 
     private static instance: Entry;
