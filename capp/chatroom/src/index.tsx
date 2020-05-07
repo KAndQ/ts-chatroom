@@ -2,13 +2,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-import PingApp from "./demo/PingApp";
+import SocketIOApp from "./demo/SocketIOPingApp";
+import WebSocketApp from "./demo/WebSocketPingApp";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
     // <React.StrictMode>
     // <App />,
-    <PingApp />,
+    // <SocketIOApp />,
+    <WebSocketApp />,
     // </React.StrictMode>,
     document.getElementById("root")
 );

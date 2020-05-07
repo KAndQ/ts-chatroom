@@ -7,7 +7,7 @@ interface IState {
     count: number;
 }
 
-export default class PingApp extends Component<any, IState> {
+export default class App extends Component<any, IState> {
     public constructor(props: any) {
         super(props);
 
@@ -17,18 +17,18 @@ export default class PingApp extends Component<any, IState> {
     }
 
     componentDidMount() {
-        let socket = SocketIO("http://127.0.0.1:48081")
+        const socket = SocketIO("http://127.0.0.1:48081/")
             .on("connect", () => {
                 console.log("[SOCKETIO CONNECT]");
 
                 setInterval(() => {
-                    socket.emit("data", "ping");
+                    socket.emit("message", "ping");
                     this.setState({ count: this.state.count + 1 });
                 }, 1000);
-                socket.emit("data", "ping");
+                socket.emit("message", "ping");
                 this.setState({ count: this.state.count + 1 });
             })
-            .on("data", (data: any) => {
+            .on("message", (data: any) => {
                 if (data instanceof String) {
                     console.log("[SOCKETIO STRING DATA]: " + data);
                 } else if (data instanceof ArrayBuffer) {

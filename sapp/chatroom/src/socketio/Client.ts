@@ -21,7 +21,7 @@ export default class Client implements IClient {
     }
 
     public sendBuffer(buf: Buffer): void {
-        this.m_socket.emit("data", buf);
+        this.m_socket.send(buf);
     }
 
     public sendString(s: string): void {

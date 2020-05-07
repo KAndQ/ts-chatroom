@@ -6,6 +6,7 @@
 
 import socketEntry from "./socket/Entry";
 import socketIOEntry from "./socketio/Entry";
+import webSocketEntry from "./websocket/Entry";
 import core from "./core/Core";
 import Dev from "./utils/Dev";
 
@@ -15,6 +16,7 @@ export default class App {
         core.init();
         socketEntry.run();
         socketIOEntry.run();
+        webSocketEntry.run();
     }
 }
 
