@@ -9,11 +9,11 @@
 ## TODOLIST
 
 -   [x] Socket 网关
--   [x] Socket.IO 网关
+-   [ ] Socket.IO 网关
 -   [ ] WebSocket 网关
--   [ ] sqlite 模块操作接口
+-   [ ] sqlite 数据库创建
+-   [ ] 用户注册
 -   [ ] 用户登录
--   [ ] 用户管理
 -   [ ] 用户上线通知
 -   [ ] 用户下线通知
 -   [ ] 接收消息
