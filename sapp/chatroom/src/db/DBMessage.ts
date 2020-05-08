@@ -3,7 +3,7 @@
  *
  * Message
  * ----
- * mid | bigint 消息 id
+ * mid | integer 消息 id
  * mtype | integer 消息类型
  * mcontent | text 消息内容, json 字符串的形式
  * msendTimestamp | integer 发送时间戳, 单位秒
@@ -15,6 +15,8 @@
 import { DataBase } from "./DataBase";
 import Dev from "../utils/Dev";
 import { DB_TABLE_MESSAGE } from "../const/Consts";
+import ChatUser from "../core/ChatUser";
+import { ChatMessageElemUnion } from "../core/ProtocolTypes";
 
 export default class DBMessage {
     /**
@@ -79,6 +81,33 @@ export default class DBMessage {
                 });
             } else {
                 reject(new Error("no sqlite db"));
+            }
+        });
+    }
+
+    /**
+     * 添加
+     */
+    public static async add(db: DataBase, message: ChatMessageElemUnion, fromChatUser: ChatUser) {
+        return new Promise((resolve, reject) => {
+            if (db.db) {
+                const mtype: number = message.elemType;
+                const mcontent = JSON.stringify(message);
+                const msendTimestamp = Math.floor(Date.now() / 1000);
+                const fromUid = fromChatUser.uid;
+                db.db.run(
+                    `INSERT INTO ${DB_TABLE_MESSAGE} (mtype, mcontent, msendTimestamp, fromUid) VALUES (?, ?, ?, ?);`,
+                    [mtype, mcontent, msendTimestamp, fromUid],
+                    (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    }
+                );
+            } else {
+                reject(new Error("No sqlite db"));
             }
         });
     }

@@ -5,10 +5,45 @@
  */
 
 import ChatUser from "./ChatUser";
+import SocketClient from "../socket/Client";
+import SocketIOClient from "../socketio/Client";
+import WebSocketClient from "../websocket/Client";
+
+export enum ChatMessageElemType {
+    TEXT, // 文本
+    EMOTION, // 表情
+    LINK, // 链接
+    FILE, // 文件
+    IMAGE, // 图片
+}
 
 export enum ChatUserStatus {
     ONLINE,
     OFFLINE,
+}
+
+export interface ChatMessageElem {
+    elemType: ChatMessageElemType;
+}
+
+export interface ChatMessageElemText extends ChatMessageElem {
+    text: string;
+}
+
+export interface ChatMessageElemEmotion extends ChatMessageElem {
+    index: number;
+}
+
+export interface ChatMessageElemLink extends ChatMessageElem {
+    url: string;
+}
+
+export interface ChatMessageElemFile extends ChatMessageElem {
+    url: string;
+}
+
+export interface ChatMessageElemImage extends ChatMessageElem {
+    url: string;
 }
 
 export interface ChatMessage {
@@ -27,3 +62,12 @@ export interface ResponseLogin {
     chatUser?: ChatUser;
     errString?: string;
 }
+
+export type ChatClient = SocketClient | WebSocketClient | SocketIOClient;
+
+export type ChatMessageElemUnion =
+    | ChatMessageElemText
+    | ChatMessageElemEmotion
+    | ChatMessageElemLink
+    | ChatMessageElemFile
+    | ChatMessageElemImage;

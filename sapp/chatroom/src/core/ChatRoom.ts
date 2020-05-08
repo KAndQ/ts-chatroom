@@ -6,59 +6,22 @@
 
 import core from "./Core";
 import { EVENT_RECV_DATA, EVENT_CONNECT_CLOSE } from "./Events";
-import SocketClient from "../socket/Client";
-import SocketIOClient from "../socketio/Client";
-import WebSocketClient from "../websocket/Client";
 import ChatUser from "./ChatUser";
 import Dev from "../utils/Dev";
 import db from "../db/DataBase";
 import DBUser from "../db/DBUser";
-import { ResponseLogin, RequestLogin, ChatUserStatus, ChatMessage } from "./ProtocolTypes";
-
-type Client = SocketClient | WebSocketClient | SocketIOClient;
-
-enum ChatMessageElemType {
-    TEXT, // 文本
-    EMOTION, // 表情
-    LINK, // 链接
-    FILE, // 文件
-    IMAGE, // 图片
-}
-
-interface ChatMessageElem {
-    elemType: ChatMessageElemType;
-}
-
-interface ChatMessageElemText extends ChatMessageElem {
-    text: string;
-}
-
-interface ChatMessageElemEmotion extends ChatMessageElem {
-    index: number;
-}
-
-interface ChatMessageElemLink extends ChatMessageElem {
-    url: string;
-}
-
-interface ChatMessageElemFile extends ChatMessageElem {
-    url: string;
-}
-
-interface ChatMessageElemImage extends ChatMessageElem {
-    url: string;
-}
-
-type ChatMessageElemUnion =
-    | ChatMessageElemText
-    | ChatMessageElemEmotion
-    | ChatMessageElemLink
-    | ChatMessageElemFile
-    | ChatMessageElemImage;
+import {
+    ResponseLogin,
+    RequestLogin,
+    ChatUserStatus,
+    ChatMessage,
+    ChatMessageElemUnion,
+    ChatClient,
+} from "./ProtocolTypes";
 
 export default class ChatRoom {
     public run(): void {
-        core.on(EVENT_RECV_DATA, (data, client: Client) => {
+        core.on(EVENT_RECV_DATA, (data, client: ChatClient) => {
             try {
                 const tdata = JSON.parse(data) as ChatMessage;
                 switch (tdata.cmd) {
@@ -85,7 +48,7 @@ export default class ChatRoom {
             }
         });
 
-        core.on(EVENT_CONNECT_CLOSE, (client: Client) => {
+        core.on(EVENT_CONNECT_CLOSE, (client: ChatClient) => {
             Dev.print("Chat Room", "connect close");
 
             const chatUser = this.m_id2Users.get(client.clientId);
@@ -98,7 +61,7 @@ export default class ChatRoom {
         });
     }
 
-    public async login(request: RequestLogin, client: Client): Promise<ResponseLogin> {
+    public async login(request: RequestLogin, client: ChatClient): Promise<ResponseLogin> {
         try {
             const chatUser = await DBUser.login(db, request.nickname, request.password);
             this.m_id2Users.set(client.clientId, chatUser);
@@ -110,13 +73,13 @@ export default class ChatRoom {
         }
     }
 
-    public heartbeat(client: Client) {}
+    public heartbeat(client: ChatClient) {}
 
     public sendMessage(
         request: {
             message: ChatMessageElemUnion;
         },
-        client: Client
+        client: ChatClient
     ) {}
 
     public pullMessages(
@@ -124,12 +87,12 @@ export default class ChatRoom {
             timestamp?: number; // 不传表示拉取最新的信息
             count: number; // 拉取消息的数量
         },
-        client: Client
+        client: ChatClient
     ) {}
 
-    public uploadFile(request: { base64String: string }, client: Client) {}
+    public uploadFile(request: { base64String: string }, client: ChatClient) {}
 
-    public uploadImage(request: { base64String: string }, client: Client) {}
+    public uploadImage(request: { base64String: string }, client: ChatClient) {}
 
     public pushChatUserStatus(chatUser: ChatUser, status: ChatUserStatus) {
         this.m_id2Users.forEach((v, k) => {
@@ -150,7 +113,7 @@ export default class ChatRoom {
 
     private m_users: ChatUser[] = [];
     private m_id2Users: Map<string, ChatUser> = new Map();
-    private m_id2Clients: Map<string, Client> = new Map();
+    private m_id2Clients: Map<string, ChatClient> = new Map();
     private m_roomName: string = "";
     private m_roomId: number = 0;
     private m_session: number = 0;
