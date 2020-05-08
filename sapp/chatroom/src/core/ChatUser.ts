@@ -9,6 +9,8 @@ export default class ChatUser {
         this.m_uid = 0;
         this.m_nickname = "";
         this.m_password = "";
+        this.m_loginTime = 0;
+        this.m_logoutTime = 0;
     }
 
     public get uid() {
@@ -35,7 +37,25 @@ export default class ChatUser {
         this.m_password = value;
     }
 
+    public get loginTime() {
+        return this.m_loginTime;
+    }
+
+    public set loginTime(value) {
+        this.m_loginTime = value;
+    }
+
+    public get logoutTime() {
+        return this.m_logoutTime;
+    }
+
+    public set logoutTime(value) {
+        this.m_logoutTime = value;
+    }
+
     private m_uid: number;
     private m_nickname: string;
     private m_password: string;
+    private m_loginTime: number;
+    private m_logoutTime: number;
 }

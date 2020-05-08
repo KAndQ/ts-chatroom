@@ -7,10 +7,15 @@
 import core from "./Core";
 import { EVENT_RECV_DATA, EVENT_CONNECT_CLOSE } from "./Events";
 import SocketClient from "../socket/Client";
+import SocketIOClient from "../socketio/Client";
+import WebSocketClient from "../websocket/Client";
 import ChatUser from "./ChatUser";
 import Dev from "../utils/Dev";
+import db from "../db/DataBase";
+import DBUser from "../db/DBUser";
+import { ResponseLogin, RequestLogin, ChatUserStatus, ChatMessage } from "./ProtocolTypes";
 
-type Client = SocketClient;
+type Client = SocketClient | WebSocketClient | SocketIOClient;
 
 enum ChatMessageElemType {
     TEXT, // 文本
@@ -55,9 +60,14 @@ export default class ChatRoom {
     public run(): void {
         core.on(EVENT_RECV_DATA, (data, client: Client) => {
             try {
-                const tdata = JSON.parse(data);
+                const tdata = JSON.parse(data) as ChatMessage;
                 switch (tdata.cmd) {
                     case "login":
+                        this.login(tdata.request, client).then((response) => {
+                            client.sendString(
+                                JSON.stringify({ cmd: tdata.cmd, session: tdata.session, response })
+                            );
+                        });
                         break;
                     case "sendMessage":
                         break;
@@ -77,17 +87,38 @@ export default class ChatRoom {
 
         core.on(EVENT_CONNECT_CLOSE, (client: Client) => {
             Dev.print("Chat Room", "connect close");
+
+            const chatUser = this.m_id2Users.get(client.clientId);
+            if (chatUser) {
+                this.m_id2Users.delete(client.clientId);
+                this.m_id2Clients.delete(client.clientId);
+                DBUser.logout(db, chatUser);
+                this.pushChatUserStatus(chatUser, ChatUserStatus.OFFLINE);
+            }
         });
     }
 
-    public login(request: { nickname: string; password: string }, client: Client): void {}
+    public async login(request: RequestLogin, client: Client): Promise<ResponseLogin> {
+        try {
+            const chatUser = await DBUser.login(db, request.nickname, request.password);
+            this.m_id2Users.set(client.clientId, chatUser);
+            this.m_id2Clients.set(client.clientId, client);
+            this.pushChatUserStatus(chatUser, ChatUserStatus.ONLINE);
+            return { chatUser };
+        } catch (e) {
+            return { errString: e.message };
+        }
+    }
+
     public heartbeat(client: Client) {}
+
     public sendMessage(
         request: {
             message: ChatMessageElemUnion;
         },
         client: Client
     ) {}
+
     public pullMessages(
         request: {
             timestamp?: number; // 不传表示拉取最新的信息
@@ -95,11 +126,32 @@ export default class ChatRoom {
         },
         client: Client
     ) {}
+
     public uploadFile(request: { base64String: string }, client: Client) {}
+
     public uploadImage(request: { base64String: string }, client: Client) {}
+
+    public pushChatUserStatus(chatUser: ChatUser, status: ChatUserStatus) {
+        this.m_id2Users.forEach((v, k) => {
+            if (v !== chatUser) {
+                const client = this.m_id2Clients.get(k);
+                if (client) {
+                    client.sendString(
+                        JSON.stringify({
+                            cmd: "pushChatUserStatus",
+                            session: ++this.m_session,
+                            request: { chatUser, status },
+                        })
+                    );
+                }
+            }
+        });
+    }
 
     private m_users: ChatUser[] = [];
     private m_id2Users: Map<string, ChatUser> = new Map();
+    private m_id2Clients: Map<string, Client> = new Map();
     private m_roomName: string = "";
     private m_roomId: number = 0;
+    private m_session: number = 0;
 }

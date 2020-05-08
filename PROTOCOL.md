@@ -163,13 +163,13 @@ interface ResponseGetOnlineUserList {
 ### 用户上线/下线推送 pushChatUserStatus
 
 ```TypeScript
-enum Status {
+enum ChatUserStatus {
     ONLINE,
     OFFLINE,
 }
 
 interface RequestPushChatUserStatus {
     chatUser: ChatUser;
-    status: Status;
+    status: ChatUserStatus;
 }
 ```
