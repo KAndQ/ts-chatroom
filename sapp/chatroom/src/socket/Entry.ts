@@ -12,9 +12,6 @@ import { EVENT_CONNECT_CLOSE } from "../core/Events";
 import Dev from "../utils/Dev";
 
 export class Entry {
-    /**
-     * 单例
-     */
     public static getInstance(): Entry {
         if (this.instance === undefined) {
             this.instance = new Entry();
@@ -22,16 +19,20 @@ export class Entry {
         return this.instance;
     }
 
-    private constructor() {
-        Entry.instance = this;
-    }
+    private constructor() {}
 
     public run(): void {
+        if (this.m_isInit) {
+            return;
+        }
+
+        this.m_isInit = true;
+
         Dev.print("Socket Entry", "run");
 
-        this.m_server = createServer(sock => {
+        this.m_server = createServer((sock) => {
             Dev.print("Socket Server", "CONNECT");
-            const client = new Client(sock, client => {
+            const client = new Client(sock, (client) => {
                 core.emit(EVENT_CONNECT_CLOSE, client);
             });
             client.run();
@@ -41,6 +42,7 @@ export class Entry {
 
     private static instance: Entry;
     private m_server: Server | undefined;
+    private m_isInit: boolean = false;
 }
 
 const socketEntry = Entry.getInstance();

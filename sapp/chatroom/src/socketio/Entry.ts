@@ -12,7 +12,22 @@ import { EVENT_RECV_DATA, EVENT_CONNECT_CLOSE } from "../core/Events";
 import Dev from "../utils/Dev";
 
 export class Entry {
+    public static getInstance() {
+        if (this.s_instance === undefined) {
+            this.s_instance = new Entry();
+        }
+        return this.s_instance;
+    }
+
+    private constructor() {}
+
     public run(): void {
+        if (this.m_isInit) {
+            return;
+        }
+
+        this.m_isInit = true;
+
         Dev.print("SocketIO Server Entry", "run");
 
         const io = SocketIO(SOCKET_IO_PORT);
@@ -34,7 +49,10 @@ export class Entry {
             });
         });
     }
+
+    private static s_instance: Entry | undefined;
+    private m_isInit: boolean = false;
 }
 
-const socketIOEntry = new Entry();
+const socketIOEntry = Entry.getInstance();
 export default socketIOEntry;

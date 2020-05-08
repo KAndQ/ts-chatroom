@@ -9,6 +9,7 @@ import socketIOEntry from "./socketio/Entry";
 import webSocketEntry from "./websocket/Entry";
 import core from "./core/Core";
 import Dev from "./utils/Dev";
+import db from "./db/DataBase";
 
 export default class App {
     public run(): void {
@@ -17,6 +18,7 @@ export default class App {
         socketEntry.run();
         socketIOEntry.run();
         webSocketEntry.run();
+        db.init();
     }
 }
 

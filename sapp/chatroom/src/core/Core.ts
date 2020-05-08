@@ -20,20 +20,24 @@ export class Core extends EventEmitter {
 
     private constructor() {
         super();
-        Core.instance = this;
-
-        this.m_chatRoom = new ChatRoom();
     }
 
     /**
      * 初始化
      */
     public init(): void {
+        if (this.m_isInit) {
+            return;
+        }
+
+        this.m_isInit = true;
+        this.m_chatRoom = new ChatRoom();
         this.m_chatRoom.run();
     }
 
     private static instance: Core;
-    private m_chatRoom: ChatRoom;
+    private m_chatRoom: ChatRoom | undefined;
+    private m_isInit: boolean = false;
 }
 
 const core = Core.getInstance();

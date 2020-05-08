@@ -12,7 +12,22 @@ import core from "../core/Core";
 import { EVENT_CONNECT_CLOSE, EVENT_RECV_DATA } from "../core/Events";
 
 export class Entry {
+    public static getInstance() {
+        if (this.s_instance === undefined) {
+            this.s_instance = new Entry();
+        }
+        return this.s_instance;
+    }
+
+    private constructor() {}
+
     public run(): void {
+        if (this.m_isInit) {
+            return;
+        }
+
+        this.m_isInit = true;
+
         Dev.print("WebSocket Server Entry", "Run!");
 
         const server = new WebSocket.Server({
@@ -37,8 +52,9 @@ export class Entry {
         });
     }
 
-    private static instance: Entry;
+    private static s_instance: Entry | undefined;
+    private m_isInit: boolean = false;
 }
 
-const entry = new Entry();
+const entry = Entry.getInstance();
 export default entry;
