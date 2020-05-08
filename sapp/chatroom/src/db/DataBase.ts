@@ -46,8 +46,12 @@ export class DataBase {
         this.m_db.on("open", () => {
             Dev.print(TAG, "==>> open");
 
-            DBUser.init(this);
-            DBMessage.init(this);
+            DBUser.init(this).then(() => {
+                Dev.print(TAG, "DBUser success");
+            });
+            DBMessage.init(this).then(() => {
+                Dev.print(TAG, "DBMessage success");
+            });
         });
         this.m_db.on("close", () => {
             Dev.print(TAG, "==>> close");

@@ -1,12 +1,13 @@
 /**
  * 数据库 User
+ *
  * User
  * ----
- * uid: integer 用户 id 自增长
- * name: string 昵称
- * password: string 密码
- * loginTime: integer 登录时间, 时间戳, 单位秒
- * logoutTime: integer 登出时间, 时间戳, 单位秒
+ * uid | integer 用户 id 自增长
+ * name | string 昵称
+ * password | string 密码
+ * loginTime | integer 登录时间, 时间戳, 单位秒
+ * logoutTime | integer 登出时间, 时间戳, 单位秒
  * @author dodo
  * @date 2020.05.08
  */
