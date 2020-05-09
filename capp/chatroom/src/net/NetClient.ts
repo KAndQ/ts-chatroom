@@ -37,6 +37,8 @@ export default class NetClient {
             if (callback) {
                 callback();
             }
+
+            this.m_sock.off("connect");
         });
 
         this.m_sock.on("connect_error", (error: Error) => {});
