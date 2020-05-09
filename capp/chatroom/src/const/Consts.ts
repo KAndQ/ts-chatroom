@@ -4,4 +4,6 @@
  * @date 2020.05.09
  */
 
-export const SOCKET_IO_HOST = "http://localhost:48081/";
+export default class Consts {
+    public static SOCKET_IO_HOST = "http://localhost:48081/";
+}

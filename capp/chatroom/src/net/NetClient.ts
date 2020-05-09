@@ -5,7 +5,7 @@
  */
 
 import io from "socket.io-client";
-import { SOCKET_IO_HOST } from "../const/Consts";
+import Consts from "../const/Consts";
 import { NetPackage } from "../model/ProtocolTypes";
 import Dev from "../utils/Dev";
 import * as binconv from "binconv";
@@ -20,7 +20,7 @@ interface ReqCallback {
 
 export default class NetClient {
     public constructor() {
-        this.m_sock = io(SOCKET_IO_HOST, {
+        this.m_sock = io(Consts.SOCKET_IO_HOST, {
             autoConnect: false,
         });
     }

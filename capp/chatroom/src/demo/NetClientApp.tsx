@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Space } from 'antd';
+import { Button, Space } from "antd";
 import "../App.css";
 import NetClient from "../net/NetClient";
 import Dev from "../utils/Dev";
@@ -33,9 +33,13 @@ class App extends Component {
                 <Button
                     type="primary"
                     onClick={() => {
-                        this.m_client.request("login", { nickname: "robot1", password: "123456" }, (resp: ResponseLogin) => {
-                            console.log(resp);
-                        });
+                        this.m_client.request(
+                            "login",
+                            { nickname: "robot1", password: "123456" },
+                            (resp: ResponseLogin) => {
+                                console.log(resp);
+                            }
+                        );
                     }}>
                     登录测试
                 </Button>

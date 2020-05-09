@@ -9,7 +9,8 @@ import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
     // <React.StrictMode>
-    <NetClientApp />,
+    <App />,
+    // <NetClientApp />,
     // <SocketIOApp />,
     // <WebSocketApp />,
     // </React.StrictMode>,

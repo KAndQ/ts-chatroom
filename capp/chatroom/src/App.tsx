@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Button from "antd/es/button";
 import "./App.css";
+import "./model/Core";
 
 class App extends Component {
     render() {
