@@ -63,22 +63,26 @@ export default class NetClient {
 
         this.m_sock.on("message", (rawdata: any) => {
             if (rawdata === "ping") {
+                Dev.print("NetClient Recv From Server", "ping");
                 this.pong();
             } else if (rawdata === "pong") {
                 Dev.print("NetClient Recv From Server", "pong");
             } else {
                 if (rawdata instanceof String) {
+                    Dev.print("NetClient Recv", rawdata.toString());
                     this.m_queue.push(JSON.parse(rawdata.toString()));
                 } else if (rawdata instanceof ArrayBuffer) {
-                    this.m_queue.push(
-                        JSON.parse(binconv.uint8ArrayToString(new Uint8Array(rawdata)))
-                    );
+                    const strjson = binconv.uint8ArrayToString(new Uint8Array(rawdata));
+                    Dev.print("NetClient Recv", strjson);
+                    this.m_queue.push(JSON.parse(strjson));
                 } else if (rawdata instanceof Blob) {
                     rawdata = rawdata as any;
                     rawdata.arrayBuffer().then((data: ArrayBuffer) => {
-                        this.m_queue.push(
-                            JSON.parse(binconv.uint8ArrayToString(new Uint8Array(data)))
+                        const strjson = JSON.parse(
+                            binconv.uint8ArrayToString(new Uint8Array(data))
                         );
+                        Dev.print("NetClient Recv", strjson);
+                        this.m_queue.push(JSON.parse(strjson));
                     });
                 } else {
                     Dev.print("SocketIO Recv Message Error", "Unknown data type");
@@ -125,7 +129,9 @@ export default class NetClient {
             session: ++this.m_session,
             request: req,
         };
-        this.sendString(JSON.stringify(netPackage));
+        const strjson = JSON.stringify(netPackage);
+        Dev.print("NetClient Send", strjson);
+        this.sendString(strjson);
 
         if (callback) {
             this.m_session2Callback.set(netPackage.session, callback);

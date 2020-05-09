@@ -17,6 +17,11 @@ export enum ChatUserStatus {
     OFFLINE,
 }
 
+export enum SceneName {
+    Login = "Login",
+    ChatRoom = "ChatRoom",
+}
+
 export interface IChatUser {
     uid: number;
     nickname: string;
@@ -74,11 +79,9 @@ export interface ResponseSendMessage {
     success: boolean;
 }
 
-export interface RequestHeartbeat {
-}
+export interface RequestHeartbeat {}
 
-export interface ResponseHeartbeat {
-}
+export interface ResponseHeartbeat {}
 
 export interface RequestPushChatUserStatus {
     chatUser: IChatUser;

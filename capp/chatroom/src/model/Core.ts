@@ -8,8 +8,11 @@ import ChatRoom from "./ChatRoom";
 import Dev from "../utils/Dev";
 import url from "url";
 import Consts from "../const/Consts";
+import { EventEmitter } from "events";
+import NetClient from "../net/NetClient";
+import { IChatUser } from "./ProtocolTypes";
 
-export class Core {
+export class Core extends EventEmitter {
     public static getInstance(): Core {
         if (this.s_instance === undefined) {
             this.s_instance = new Core();
@@ -18,6 +21,8 @@ export class Core {
     }
 
     private constructor() {
+        super();
+
         const urlObj = url.parse(window.location.href, true);
 
         // 主机
@@ -34,6 +39,7 @@ export class Core {
         }
 
         this.m_room = new ChatRoom();
+        this.m_client = new NetClient();
     }
 
     public get defaultRoom() {
@@ -41,17 +47,37 @@ export class Core {
     }
 
     public get defaultName() {
+        if (this.m_defaultUser) {
+            return this.m_defaultUser.nickname;
+        }
         return this.m_defaultName;
     }
 
     public get defaultPassword() {
+        if (this.m_defaultUser) {
+            return this.m_defaultUser.password;
+        }
         return this.m_defaultPassword;
     }
 
-    private static s_instance: Core | undefined;
+    public get client() {
+        return this.m_client;
+    }
+
+    public get defaultUser() {
+        return this.m_defaultUser;
+    }
+
+    public set defaultUser(value) {
+        this.m_defaultUser = value;
+    }
+
+    private static s_instance?: Core;
     private m_room: ChatRoom;
-    private m_defaultName: string | undefined;
-    private m_defaultPassword: string | undefined;
+    private m_defaultName?: string;
+    private m_defaultPassword?: string;
+    private m_client: NetClient;
+    private m_defaultUser?: IChatUser;
 }
 
 const core = Core.getInstance();

@@ -2,9 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-import SocketIOApp from "./demo/SocketIOPingApp";
-import WebSocketApp from "./demo/WebSocketPingApp";
-import NetClientApp from "./demo/NetClientApp";
+// import SocketIOApp from "./demo/SocketIOPingApp";
+// import WebSocketApp from "./demo/WebSocketPingApp";
+// import NetClientApp from "./demo/NetClientApp";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
