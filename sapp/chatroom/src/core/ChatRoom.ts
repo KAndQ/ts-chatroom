@@ -26,9 +26,9 @@ import DBMessage from "../db/DBMessage";
 
 export default class ChatRoom {
     public run(): void {
-        core.on(EVENT_RECV_DATA, (data, client: ChatClient) => {
+        core.on(EVENT_RECV_DATA, (client: ChatClient, strjson: string) => {
             try {
-                const tdata = JSON.parse(data) as NetPackage;
+                const tdata = JSON.parse(strjson) as NetPackage;
                 switch (tdata.cmd) {
                     case "login":
                         this.login(tdata.request, client).then((res) => {
@@ -80,7 +80,7 @@ export default class ChatRoom {
             this.m_id2Users.set(client.clientId, chatUser);
             this.m_id2Clients.set(client.clientId, client);
             this.pushChatUserStatus(chatUser, ChatUserStatus.ONLINE);
-            return { chatUser };
+            return { chatUser: chatUser.toData() };
         } catch (e) {
             return { errString: e.message };
         }
@@ -133,7 +133,7 @@ export default class ChatRoom {
             if (v !== chatUser) {
                 const client = this.m_id2Clients.get(k);
                 if (client) {
-                    this.push("pushChatUserStatus", { chatUser, status }, client);
+                    this.push("pushChatUserStatus", { chatUser: chatUser.toData(), status }, client);
                 }
             }
         });

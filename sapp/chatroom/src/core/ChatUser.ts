@@ -4,7 +4,9 @@
  * @date 2020.04.27
  */
 
-export default class ChatUser {
+import { IChatUser } from "./ProtocolTypes";
+
+export default class ChatUser implements IChatUser {
     public constructor() {
         this.m_uid = 0;
         this.m_nickname = "";
@@ -51,6 +53,16 @@ export default class ChatUser {
 
     public set logoutTime(value) {
         this.m_logoutTime = value;
+    }
+
+    public toData(): IChatUser {
+        return {
+            uid: this.m_uid,
+            nickname: this.m_nickname,
+            password: this.m_password,
+            loginTime: this.m_loginTime,
+            logoutTime: this.m_logoutTime,
+        };
     }
 
     private m_uid: number;

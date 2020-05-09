@@ -4,10 +4,6 @@
  * @date 2020.05.08
  */
 
-import SocketClient from "../socket/Client";
-import SocketIOClient from "../socketio/Client";
-import WebSocketClient from "../websocket/Client";
-
 export enum ChatMessageElemType {
     TEXT, // 文本
     EMOTION, // 表情
@@ -92,8 +88,6 @@ export interface RequestPushChatUserStatus {
 export interface RequestSendMessage {
     message: ChatMessageElemUnion;
 }
-
-export type ChatClient = SocketClient | WebSocketClient | SocketIOClient;
 
 export type ChatMessageElemUnion =
     | ChatMessageElemText

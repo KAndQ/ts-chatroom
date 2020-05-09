@@ -39,8 +39,20 @@ export class Entry {
                 if (data === "ping") {
                     Dev.print("SocketIO Server Recv", "PING");
                     client.pong();
+                } else if (data === "pong") {
+                    Dev.print("SocketIO Server Recv", "PONG");
                 } else {
-                    core.emit(EVENT_RECV_DATA, client, data);
+                    if (data instanceof String) {
+                        core.emit(EVENT_RECV_DATA, client, data);
+                    } else if (data instanceof ArrayBuffer) {
+                        const buf = Buffer.from(data);
+                        core.emit(EVENT_RECV_DATA, client, buf.toString());
+                    } else if (data instanceof Buffer) {
+                        core.emit(EVENT_RECV_DATA, client, data.toString());
+                    } else {
+                        Dev.print("SocketIO Server Recv Error", "Unknown data type");
+                        console.log(data);
+                    }
                 }
             });
             socket.on("disconnect", (reason) => {

@@ -29,12 +29,12 @@ export default class Client implements IClient {
     }
 
     public ping(): void {
-        this.sendString("ping");
+        this.m_socket.send("ping");
     }
 
     public pong(): void {
-        this.sendString("pong");
-        Dev.print("SocketIO Server Client Send", "PONG");
+        this.m_socket.send("pong");
+        Dev.print("SocketIO Server Send to client", "PONG");
     }
 
     private m_socket: Socket;

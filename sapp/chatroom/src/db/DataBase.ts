@@ -48,9 +48,6 @@ export class DataBase {
 
             DBUser.init(this).then(async () => {
                 Dev.print(TAG, "DBUser success");
-
-                const chatUser = await DBUser.login(this, "robot2", "123456");
-                console.log(chatUser);
             });
             DBMessage.init(this).then(() => {
                 Dev.print(TAG, "DBMessage success");
