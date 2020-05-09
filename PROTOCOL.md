@@ -132,7 +132,7 @@ interface RequestSendMessage {
 
 ```TypeScript
 interface RequestPullMessages {
-    timestamp?: number; // 不传表示拉取最新的信息
+    mid?: number; // 消息的 id, 不传则拉取最新的消息
     count: number; // 拉取消息的数量
 }
 

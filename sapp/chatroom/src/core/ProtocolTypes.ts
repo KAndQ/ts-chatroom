@@ -46,7 +46,7 @@ export interface ChatMessageElemImage extends ChatMessageElem {
     url: string;
 }
 
-export interface ChatMessage {
+export interface NetPackage {
     cmd: string;
     session: number;
     request?: any;
@@ -61,6 +61,20 @@ export interface RequestLogin {
 export interface ResponseLogin {
     chatUser?: ChatUser;
     errString?: string;
+}
+
+export interface RequestSendMessage {
+    message: ChatMessageElemUnion;
+}
+
+export interface ResponseSendMessage {
+    success: boolean;
+}
+
+export interface RequestHeartbeat {
+}
+
+export interface ResponseHeartbeat {
 }
 
 export type ChatClient = SocketClient | WebSocketClient | SocketIOClient;
