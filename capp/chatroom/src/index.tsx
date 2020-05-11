@@ -4,13 +4,13 @@ import "./index.css";
 import App from "./App";
 // import SocketIOApp from "./demo/SocketIOPingApp";
 // import WebSocketApp from "./demo/WebSocketPingApp";
-// import NetClientApp from "./demo/NetClientApp";
+import NetClientApp from "./demo/NetClientApp";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
     // <React.StrictMode>
-    <App />,
-    // <NetClientApp />,
+    // <App />,
+    <NetClientApp />,
     // <SocketIOApp />,
     // <WebSocketApp />,
     // </React.StrictMode>,

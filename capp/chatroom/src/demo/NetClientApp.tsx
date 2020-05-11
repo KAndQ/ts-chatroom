@@ -11,6 +11,16 @@ class App extends Component {
         this.m_client = new NetClient();
     }
 
+    subscribe() {
+        this.m_client.subscribe("pushChatUserStatus", (resp) => {
+            console.log("pushChatUserStatus", resp);
+        });
+
+        this.m_client.subscribe("pushMessage", (resp) => {
+            console.log("pushMessage", resp);
+        });
+    }
+
     render() {
         return (
             <Space>
@@ -18,6 +28,7 @@ class App extends Component {
                     type="primary"
                     onClick={() => {
                         this.m_client.connect(() => {
+                            this.subscribe();
                             Dev.print("NetClientApp", "connect to server");
                         });
                     }}>
@@ -33,15 +44,50 @@ class App extends Component {
                 <Button
                     type="primary"
                     onClick={() => {
-                        this.m_client.request(
-                            "login",
-                            { nickname: "robot1", password: "123456" },
-                            (resp: ResponseLogin) => {
-                                console.log(resp);
-                            }
-                        );
+                        this.m_client.connect(() => {
+                            this.subscribe();
+                            this.m_client.request(
+                                "login",
+                                { nickname: "robot1", password: "123456" },
+                                (resp: ResponseLogin) => {
+                                    console.log("login robot1", resp);
+                                }
+                            );
+                        });
                     }}>
-                    登录测试
+                    登录 robot1
+                </Button>
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        this.m_client.connect(() => {
+                            this.subscribe();
+                            this.m_client.request(
+                                "login",
+                                { nickname: "robot2", password: "123456" },
+                                (resp: ResponseLogin) => {
+                                    console.log("login robot2", resp);
+                                }
+                            );
+                        });
+                    }}>
+                    登录 robot2
+                </Button>
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        this.m_client.connect(() => {
+                            this.subscribe();
+                            this.m_client.request(
+                                "login",
+                                { nickname: "robot3", password: "123456" },
+                                (resp: ResponseLogin) => {
+                                    console.log("login robot3", resp);
+                                }
+                            );
+                        });
+                    }}>
+                    登录 robot3
                 </Button>
             </Space>
         );

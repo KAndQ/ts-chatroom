@@ -143,7 +143,7 @@ export default class NetClient {
     /**
      * 订阅服务器的推送
      */
-    public subscibe(cmd: string, callback: ReqCallback) {
+    public subscribe(cmd: string, callback: ReqCallback) {
         let callbacks = this.m_cmd2Calbacks.get(cmd);
         if (callbacks === undefined) {
             callbacks = [];
