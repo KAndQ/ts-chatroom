@@ -11,6 +11,7 @@ import { EVENT_CHANGE_SCENE } from "../../model/Events";
 import { SceneName, ResponseLogin } from "../../model/ProtocolTypes";
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
 import Dev from "../../utils/Dev";
+import NetUser from "../../net/NetUser";
 
 interface IState {
     name?: string;
@@ -180,23 +181,25 @@ export default class Login extends Component<any, IState> {
         });
         Dev.print("Login", `name = ${this.state.name}, password = ${this.state.password}`);
 
-        core.client.connect(() => {
-            core.client.request(
-                "login",
-                { nickname: this.state.name, password: this.state.password },
-                (rep: ResponseLogin) => {
-                    if (rep.errString) {
-                        message.error(rep.errString);
+        core.client.connect(async () => {
+            if (this.state.name && this.state.password) {
+                const rep = await NetUser.login({
+                    nickname: this.state.name,
+                    password: this.state.password,
+                });
+                if (rep.errString) {
+                    message.error(rep.errString);
 
-                        this.setState({
-                            loading: false,
-                        });
-                    } else {
-                        core.defaultUser = rep.chatUser;
-                        core.emit(EVENT_CHANGE_SCENE, SceneName.ChatRoom);
-                    }
+                    this.setState({
+                        loading: false,
+                    });
+                } else {
+                    core.defaultUser = rep.chatUser;
+                    core.emit(EVENT_CHANGE_SCENE, SceneName.ChatRoom);
                 }
-            );
+            } else {
+                message.error("不可思议!!!");
+            }
         });
     }
 }

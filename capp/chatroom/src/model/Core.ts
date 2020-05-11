@@ -11,6 +11,8 @@ import Consts from "../const/Consts";
 import { EventEmitter } from "events";
 import NetClient from "../net/NetClient";
 import { IChatUser } from "./ProtocolTypes";
+import { Store } from "antd/lib/form/interface";
+import store from "./Store";
 
 export class Core extends EventEmitter {
     public static getInstance(): Core {
@@ -40,6 +42,7 @@ export class Core extends EventEmitter {
 
         this.m_room = new ChatRoom();
         this.m_client = new NetClient();
+        this.m_store = store;
     }
 
     public get defaultRoom() {
@@ -72,12 +75,17 @@ export class Core extends EventEmitter {
         this.m_defaultUser = value;
     }
 
+    public get store() {
+        return this.m_store;
+    }
+
     private static s_instance?: Core;
     private m_room: ChatRoom;
     private m_defaultName?: string;
     private m_defaultPassword?: string;
     private m_client: NetClient;
     private m_defaultUser?: IChatUser;
+    private m_store: Store;
 }
 
 const core = Core.getInstance();
