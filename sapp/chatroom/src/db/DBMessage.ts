@@ -88,28 +88,77 @@ export default class DBMessage {
     /**
      * 添加
      */
-    public static async add(db: DataBase, elem: ChatMessageElemUnion, fromChatUser: ChatUser): Promise<IChatMessage> {
+    public static async add(
+        db: DataBase,
+        elem: ChatMessageElemUnion,
+        fromChatUser: ChatUser
+    ): Promise<IChatMessage> {
         return new Promise((resolve, reject) => {
             if (db.db) {
                 const mtype: number = elem.elemType;
                 const mcontent = JSON.stringify(elem);
                 const msendTimestamp = Math.floor(Date.now() / 1000);
                 const fromUid = fromChatUser.uid;
-                db.db.run(
+                const sqlitedb = db.db;
+                sqlitedb.run(
                     `INSERT INTO ${DB_TABLE_MESSAGE} (mtype, mcontent, msendTimestamp, fromUid) VALUES (?, ?, ?, ?);`,
                     [mtype, mcontent, msendTimestamp, fromUid],
                     (err) => {
                         if (err) {
                             reject(err);
                         } else {
-                            resolve({
-                                fromUid: fromChatUser.uid,
-                                msendTimestamp: msendTimestamp,
-                                elem: elem,
-                            });
+                            sqlitedb.get(
+                                `SELECT * FROM ${DB_TABLE_MESSAGE} ORDER BY mid DESC LIMIT 1;`,
+                                (err, row) => {
+                                    if (err) {
+                                        reject(err);
+                                    } else {
+                                        resolve({
+                                            mid: row.mid,
+                                            fromUid: fromChatUser.uid,
+                                            msendTimestamp: msendTimestamp,
+                                            elem: elem,
+                                        });
+                                    }
+                                }
+                            );
                         }
                     }
                 );
+            } else {
+                reject(new Error("No sqlite db"));
+            }
+        });
+    }
+
+    /**
+     * 获取消息
+     */
+    public static async get(db: DataBase, count: number, mid?: number): Promise<IChatMessage[]> {
+        return new Promise((resolve, reject) => {
+            let sql = `SELECT * FROM ${DB_TABLE_MESSAGE} `;
+            if (mid !== undefined) {
+                sql += `WHERE mid < ${mid} `;
+            }
+            sql += `ORDER BY mid DESC LIMIT ${count};`;
+
+            if (db.db) {
+                db.db.all(sql, (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        const messages: IChatMessage[] = [];
+                        rows.forEach((v) => {
+                            messages.push({
+                                mid: v.mid,
+                                fromUid: v.fromUid,
+                                msendTimestamp: v.msendTimestamp,
+                                elem: JSON.parse(v.mcontent),
+                            });
+                        });
+                        resolve(messages);
+                    }
+                });
             } else {
                 reject(new Error("No sqlite db"));
             }

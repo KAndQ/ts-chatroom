@@ -124,7 +124,8 @@ export default class ChatRoom {
         request: RequestPullMessages,
         client: ChatClient
     ): Promise<ResponsePullMessages> {
-
+        const messages = await DBMessage.get(db, request.count, request.mid);
+        return { messages };
     }
 
     public uploadFile(request: { base64String: string }, client: ChatClient) {}

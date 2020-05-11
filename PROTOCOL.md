@@ -18,6 +18,7 @@ interface {
 
 ```TypeScript
 interface IChatMessage {
+    mid: number; // 消息的 id
     fromUid: number; // 发送用户 id
     msendTimestamp: number; // 发送时间戳, 以秒为单位
     message: ChatMessageElemUnion; // 发送元素
@@ -159,17 +160,6 @@ interface ResponsePullMessages {
 ### 上传图片 uploadImage
 
 使用 http 协议上传图片, 返回图片的下载地址
-
-### 请求在线用户列表 getOnlineUserList
-
-```TypeScript
-interface RequestGetOnlineUserList {
-}
-
-interface ResponseGetOnlineUserList {
-    chatUsers: ChatUser[];
-}
-```
 
 ### 用户上线/下线推送 pushChatUserStatus
 
