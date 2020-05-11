@@ -23,6 +23,9 @@ import {
     RequestPullMessages,
     ResponsePullMessages,
     IChatMessage,
+    RequestGetRoomInfo,
+    ResponseGetRoomInfo,
+    IChatUser,
 } from "./ProtocolTypes";
 import DBMessage from "../db/DBMessage";
 
@@ -57,6 +60,11 @@ export default class ChatRoom {
                         break;
                     case "heartbeat":
                         this.heartbeat(tdata.request, client).then((res) => {
+                            this.response(tdata, res, client);
+                        });
+                        break;
+                    case "getRoomInfo":
+                        this.getRoomInfo(tdata.request, client).then((res) => {
                             this.response(tdata, res, client);
                         });
                         break;
@@ -126,6 +134,23 @@ export default class ChatRoom {
     ): Promise<ResponsePullMessages> {
         const messages = await DBMessage.get(db, request.count, request.mid);
         return { messages };
+    }
+
+    public async getRoomInfo(
+        request: RequestGetRoomInfo,
+        client: ChatClient
+    ): Promise<ResponseGetRoomInfo> {
+        const onlineUsers: IChatUser[] = [];
+        this.m_uid2Users.forEach(v => {
+            onlineUsers.push(v.toData());
+        });
+        return Promise.resolve({
+            room: {
+                onlineUsers,
+                roomName: this.m_roomName,
+                roomId: this.m_roomId,
+            }
+        });
     }
 
     public uploadFile(request: { base64String: string }, client: ChatClient) {}
