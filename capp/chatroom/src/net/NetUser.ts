@@ -21,6 +21,7 @@ export default class NetUser {
             core.client.request("login", request, (resp: ResponseLogin) => {
                 if (resp.chatUser) {
                     core.defaultUser = resp.chatUser;
+                    core.store.myself = resp.chatUser;
                 }
                 resolve(resp);
             });

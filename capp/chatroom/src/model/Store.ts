@@ -4,7 +4,7 @@
  * @date 2020.05.11
  */
 
-import { IChatRoom } from "./ProtocolTypes";
+import { IChatRoom, IChatUser } from "./ProtocolTypes";
 
 export class Store {
     public static getInstance(): Store {
@@ -18,6 +18,7 @@ export class Store {
 
     private static s_instance?: Store;
     public charRoom?: IChatRoom;
+    public myself?: IChatUser;
 }
 
 const store = Store.getInstance();
