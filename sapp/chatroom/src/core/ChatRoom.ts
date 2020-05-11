@@ -68,6 +68,7 @@ export default class ChatRoom {
             if (chatUser) {
                 this.m_id2Users.delete(client.clientId);
                 this.m_id2Clients.delete(client.clientId);
+                this.m_uid2Users.delete(chatUser.uid);
                 DBUser.logout(db, chatUser);
                 this.pushChatUserStatus(chatUser, ChatUserStatus.OFFLINE);
             }
@@ -77,8 +78,12 @@ export default class ChatRoom {
     public async login(request: RequestLogin, client: ChatClient): Promise<ResponseLogin> {
         try {
             const chatUser = await DBUser.login(db, request.nickname, request.password);
+            if (this.m_uid2Users.has(chatUser.uid)) {
+                return { errString: "用户已登录" };
+            }
             this.m_id2Users.set(client.clientId, chatUser);
             this.m_id2Clients.set(client.clientId, client);
+            this.m_uid2Users.set(chatUser.uid, chatUser);
             this.pushChatUserStatus(chatUser, ChatUserStatus.ONLINE);
             return { chatUser: chatUser.toData() };
         } catch (e) {
@@ -133,7 +138,11 @@ export default class ChatRoom {
             if (v !== chatUser) {
                 const client = this.m_id2Clients.get(k);
                 if (client) {
-                    this.push("pushChatUserStatus", { chatUser: chatUser.toData(), status }, client);
+                    this.push(
+                        "pushChatUserStatus",
+                        { chatUser: chatUser.toData(), status },
+                        client
+                    );
                 }
             }
         });
@@ -159,6 +168,7 @@ export default class ChatRoom {
         );
     }
 
+    private m_uid2Users: Map<number, ChatUser> = new Map();
     private m_id2Users: Map<string, ChatUser> = new Map();
     private m_id2Clients: Map<string, ChatClient> = new Map();
     private m_roomName: string = "寄叶部队-O2组";

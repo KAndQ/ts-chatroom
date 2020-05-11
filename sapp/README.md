@@ -9,8 +9,8 @@
 ## TODOLIST
 
 -   [x] Socket 网关
--   [ ] Socket.IO 网关
--   [ ] WebSocket 网关
+-   [x] Socket.IO 网关
+-   [x] WebSocket 网关
 -   [x] sqlite 数据库创建
 -   [x] 用户注册
 -   [x] 用户登录
