@@ -39,9 +39,16 @@ export interface IChatUser {
 }
 
 export interface IChatMessage {
+    mid: number; // 消息的 id
     fromUid: number; // 发送用户 id
     msendTimestamp: number; // 发送时间戳, 以秒为单位
     elem: ChatMessageElemUnion; // 发送元素
+}
+
+export interface IChatRoom {
+    roomId: number;
+    roomName: string;
+    onlineUsers: IChatUser[];
 }
 
 export interface ChatMessageElem {
@@ -121,4 +128,11 @@ export interface ResponsePullMessages {
 
 export interface RequestPushMessage {
     message: IChatMessage;
+}
+
+export interface RequestGetRoomInfo {
+}
+
+export interface ResponseGetRoomInfo {
+    room: IChatRoom;
 }
