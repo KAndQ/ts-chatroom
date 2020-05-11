@@ -15,12 +15,14 @@ import {
     RequestLogin,
     ChatUserStatus,
     NetPackage,
-    ChatMessageElemUnion,
     ChatClient,
     RequestSendMessage,
     ResponseSendMessage,
     RequestHeartbeat,
     ResponseHeartbeat,
+    RequestPullMessages,
+    ResponsePullMessages,
+    IChatMessage,
 } from "./ProtocolTypes";
 import DBMessage from "../db/DBMessage";
 
@@ -39,12 +41,15 @@ export default class ChatRoom {
                         this.sendMessage(tdata.request, client).then((res) => {
                             this.response(tdata, res, client);
 
-                            if (res.success) {
-                                this.pushMessage(tdata.request.message);
+                            if (res.success && res.message) {
+                                this.pushMessage(res.message);
                             }
                         });
                         break;
                     case "pullMessages":
+                        this.pullMessages(tdata.request, client).then((res) => {
+                            this.response(tdata, res, client);
+                        });
                         break;
                     case "uploadFile":
                         break;
@@ -105,8 +110,8 @@ export default class ChatRoom {
         const chatUser = this.m_id2Users.get(client.clientId);
         if (chatUser) {
             try {
-                await DBMessage.add(db, request.message, chatUser);
-                return { success: true };
+                const chatMessage = await DBMessage.add(db, request.elem, chatUser);
+                return { success: true, message: chatMessage };
             } catch (e) {
                 Dev.print("Chat Room sendMessage error", e.message);
                 return { success: false };
@@ -115,19 +120,18 @@ export default class ChatRoom {
         return { success: false };
     }
 
-    public pullMessages(
-        request: {
-            timestamp?: number; // 不传表示拉取最新的信息
-            count: number; // 拉取消息的数量
-        },
+    public async pullMessages(
+        request: RequestPullMessages,
         client: ChatClient
-    ) {}
+    ): Promise<ResponsePullMessages> {
+
+    }
 
     public uploadFile(request: { base64String: string }, client: ChatClient) {}
 
     public uploadImage(request: { base64String: string }, client: ChatClient) {}
 
-    public pushMessage(message: ChatMessageElemUnion) {
+    public pushMessage(message: IChatMessage) {
         this.m_id2Clients.forEach((v) => {
             this.push("pushMessage", { message }, v);
         });
@@ -172,6 +176,6 @@ export default class ChatRoom {
     private m_id2Users: Map<string, ChatUser> = new Map();
     private m_id2Clients: Map<string, ChatClient> = new Map();
     private m_roomName: string = "寄叶部队-O2组";
-    private m_roomId: number = 0;
+    private m_roomId: number = 7;
     private m_session: number = 0;
 }

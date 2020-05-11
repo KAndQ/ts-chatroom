@@ -14,13 +14,23 @@ interface {
 }
 ```
 
-### ChatMessage
+### IChatMessage
 
 ```TypeScript
-interface ChatMessage {
-    fromChatUser: ChatUser; // 发送用户
-    timestamp: number; // 发送时间戳
-    elment: ChatMessageElem; // 发送元素
+interface IChatMessage {
+    fromUid: number; // 发送用户 id
+    msendTimestamp: number; // 发送时间戳, 以秒为单位
+    message: ChatMessageElemUnion; // 发送元素
+}
+```
+
+### IChatRoom
+
+```TypeScript
+interface IChatRoom {
+    roomId: number;
+    roomName: string;
+    onlineUsers: ChatUser[];
 }
 ```
 
@@ -104,11 +114,12 @@ interface ResponseHeartbeat {
 
 ```TypeScript
 interface RequestSendMessage {
-    message: ChatMessageElemUnion;
+    elem: ChatMessageElemUnion;
 }
 
 interface ResponseSendMessage {
     success: boolean;
+    message?: IChatMessage;
 }
 ```
 
@@ -119,7 +130,7 @@ interface ResponseSendMessage {
 - [x] websocket
 
 ```TypeScript
-interface RequestSendMessage {
+interface RequestPushMessage {
     message: ChatMessageElemUnion;
 }
 ```
@@ -137,7 +148,7 @@ interface RequestPullMessages {
 }
 
 interface ResponsePullMessages {
-    messages: ChatMessage[];
+    messages: IChatMessage[];
 }
 ```
 
@@ -171,5 +182,16 @@ enum ChatUserStatus {
 interface RequestPushChatUserStatus {
     chatUser: ChatUser;
     status: ChatUserStatus;
+}
+```
+
+### 请求房间信息 getRoomInfo
+
+```TypeScript
+interface RequestGetRoomInfo {
+}
+
+interface ResponseGetRoomInfo {
+    room: IChatRoom;
 }
 ```

@@ -4,6 +4,19 @@
  * @date 2020.05.08
  */
 
+/********************************************************************************
+ * 客户端类型定义
+ *********************************************************************************/
+
+export enum SceneName {
+    Login = "Login",
+    ChatRoom = "ChatRoom",
+}
+
+/********************************************************************************
+ * 服务端类型定义
+ *********************************************************************************/
+
 export enum ChatMessageElemType {
     TEXT, // 文本
     EMOTION, // 表情
@@ -17,17 +30,18 @@ export enum ChatUserStatus {
     OFFLINE,
 }
 
-export enum SceneName {
-    Login = "Login",
-    ChatRoom = "ChatRoom",
-}
-
 export interface IChatUser {
     uid: number;
     nickname: string;
     password: string;
     loginTime: number;
     logoutTime: number;
+}
+
+export interface IChatMessage {
+    fromUid: number; // 发送用户 id
+    msendTimestamp: number; // 发送时间戳, 以秒为单位
+    elem: ChatMessageElemUnion; // 发送元素
 }
 
 export interface ChatMessageElem {
@@ -54,6 +68,13 @@ export interface ChatMessageElemImage extends ChatMessageElem {
     url: string;
 }
 
+export type ChatMessageElemUnion =
+    | ChatMessageElemText
+    | ChatMessageElemEmotion
+    | ChatMessageElemLink
+    | ChatMessageElemFile
+    | ChatMessageElemImage;
+
 export interface NetPackage {
     cmd: string;
     session: number;
@@ -72,11 +93,12 @@ export interface ResponseLogin {
 }
 
 export interface RequestSendMessage {
-    message: ChatMessageElemUnion;
+    elem: ChatMessageElemUnion;
 }
 
 export interface ResponseSendMessage {
     success: boolean;
+    message?: IChatMessage;
 }
 
 export interface RequestHeartbeat {}
@@ -88,13 +110,15 @@ export interface RequestPushChatUserStatus {
     status: ChatUserStatus;
 }
 
-export interface RequestSendMessage {
-    message: ChatMessageElemUnion;
+export interface RequestPullMessages {
+    mid?: number; // 消息的 id, 不传则拉取最新的消息
+    count: number; // 拉取消息的数量
 }
 
-export type ChatMessageElemUnion =
-    | ChatMessageElemText
-    | ChatMessageElemEmotion
-    | ChatMessageElemLink
-    | ChatMessageElemFile
-    | ChatMessageElemImage;
+export interface ResponsePullMessages {
+    messages: IChatMessage[];
+}
+
+export interface RequestPushMessage {
+    message: IChatMessage;
+}

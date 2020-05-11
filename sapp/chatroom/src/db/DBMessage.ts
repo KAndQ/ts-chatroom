@@ -16,7 +16,7 @@ import { DataBase } from "./DataBase";
 import Dev from "../utils/Dev";
 import { DB_TABLE_MESSAGE } from "../const/Consts";
 import ChatUser from "../core/ChatUser";
-import { ChatMessageElemUnion } from "../core/ProtocolTypes";
+import { ChatMessageElemUnion, IChatMessage } from "../core/ProtocolTypes";
 
 export default class DBMessage {
     /**
@@ -88,11 +88,11 @@ export default class DBMessage {
     /**
      * 添加
      */
-    public static async add(db: DataBase, message: ChatMessageElemUnion, fromChatUser: ChatUser) {
+    public static async add(db: DataBase, elem: ChatMessageElemUnion, fromChatUser: ChatUser): Promise<IChatMessage> {
         return new Promise((resolve, reject) => {
             if (db.db) {
-                const mtype: number = message.elemType;
-                const mcontent = JSON.stringify(message);
+                const mtype: number = elem.elemType;
+                const mcontent = JSON.stringify(elem);
                 const msendTimestamp = Math.floor(Date.now() / 1000);
                 const fromUid = fromChatUser.uid;
                 db.db.run(
@@ -102,7 +102,11 @@ export default class DBMessage {
                         if (err) {
                             reject(err);
                         } else {
-                            resolve();
+                            resolve({
+                                fromUid: fromChatUser.uid,
+                                msendTimestamp: msendTimestamp,
+                                elem: elem,
+                            });
                         }
                     }
                 );
