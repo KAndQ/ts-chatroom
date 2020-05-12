@@ -136,3 +136,11 @@ export interface RequestGetRoomInfo {
 export interface ResponseGetRoomInfo {
     room: IChatRoom;
 }
+
+export interface RequestGetUserInfo {
+    uid: number;
+}
+
+export interface ResponseGetUserInfo {
+    chatUser?: IChatUser;
+}

@@ -26,6 +26,8 @@ import {
     RequestGetRoomInfo,
     ResponseGetRoomInfo,
     IChatUser,
+    RequestGetUserInfo,
+    ResponseGetUserInfo,
 } from "./ProtocolTypes";
 import DBMessage from "../db/DBMessage";
 
@@ -65,6 +67,11 @@ export default class ChatRoom {
                         break;
                     case "getRoomInfo":
                         this.getRoomInfo(tdata.request, client).then((res) => {
+                            this.response(tdata, res, client);
+                        });
+                        break;
+                    case "getUserInfo":
+                        this.getUserInfo(tdata.request, client).then((res) => {
                             this.response(tdata, res, client);
                         });
                         break;
@@ -151,6 +158,15 @@ export default class ChatRoom {
                 roomId: this.m_roomId,
             }
         });
+    }
+
+    public async getUserInfo(request: RequestGetUserInfo, client: ChatClient): Promise<ResponseGetUserInfo> {
+        const chatUser = await DBUser.getWithUid(db, request.uid);
+        if (chatUser) {
+            return { chatUser: chatUser.toData() };
+        } else {
+            return {};
+        }
     }
 
     public uploadFile(request: { base64String: string }, client: ChatClient) {}

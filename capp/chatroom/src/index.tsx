@@ -5,6 +5,8 @@ import App from "./App";
 // import SocketIOApp from "./demo/SocketIOPingApp";
 // import WebSocketApp from "./demo/WebSocketPingApp";
 // import NetClientApp from "./demo/NetClientApp";
+// import InfiniteDivApp from "./demo/InfiniteDivApp";
+// import ReactScrollApp from "./demo/ReactScrollApp";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
@@ -13,6 +15,8 @@ ReactDOM.render(
     // <NetClientApp />,
     // <SocketIOApp />,
     // <WebSocketApp />,
+    // <InfiniteDivApp />,
+    // <ReactScrollApp />,
     // </React.StrictMode>,
     document.getElementById("root")
 );

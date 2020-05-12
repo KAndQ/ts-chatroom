@@ -49,7 +49,7 @@ export class DataBase {
             DBUser.init(this).then(async () => {
                 Dev.print(TAG, "DBUser success");
             });
-            DBMessage.init(this).then(() => {
+            DBMessage.init(this).then(async () => {
                 Dev.print(TAG, "DBMessage success");
             });
         });

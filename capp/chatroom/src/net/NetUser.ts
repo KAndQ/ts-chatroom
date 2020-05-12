@@ -10,7 +10,13 @@ import {
     ResponseLogin,
     RequestHeartbeat,
     ResponseHeartbeat,
+    RequestGetUserInfo,
+    ResponseGetUserInfo,
+    IChatUser,
+    RequestPushChatUserStatus,
+    ChatUserStatus,
 } from "../model/ProtocolTypes";
+import { EVENT_OFFLINE_USER, EVENT_ONLINE_USER } from "../model/Events";
 
 export default class NetUser {
     /**
@@ -36,6 +42,30 @@ export default class NetUser {
             core.client.request("heartbeat", request, (resp: ResponseHeartbeat) => {
                 resolve();
             });
+        });
+    }
+
+    /**
+     * 使用 uid 获取用户信息
+     */
+    public static async getUserInfo(request: RequestGetUserInfo): Promise<IChatUser | undefined> {
+        return new Promise((resolve) => {
+            core.client.request("getUserInfo", request, (resp: ResponseGetUserInfo) => {
+                resolve(resp.chatUser);
+            });
+        });
+    }
+
+    /**
+     * 订阅推送的玩家状态信息
+     */
+    public static subscribePushChatUserStatus() {
+        core.client.subscribe("pushChatUserStatus", (req: RequestPushChatUserStatus) => {
+            if (req.status === ChatUserStatus.OFFLINE) {
+                core.emit(EVENT_OFFLINE_USER, req.chatUser);
+            } else if (req.status === ChatUserStatus.ONLINE) {
+                core.emit(EVENT_ONLINE_USER, req.chatUser);
+            }
         });
     }
 }

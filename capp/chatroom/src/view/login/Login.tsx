@@ -8,10 +8,11 @@ import React, { Component } from "react";
 import { Button, Input, Spin, message } from "antd";
 import core from "../../model/Core";
 import { EVENT_CHANGE_SCENE } from "../../model/Events";
-import { SceneName, ResponseLogin } from "../../model/ProtocolTypes";
+import { SceneName } from "../../model/ProtocolTypes";
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
 import Dev from "../../utils/Dev";
 import NetUser from "../../net/NetUser";
+import NetMessage from "../../net/NetMessage";
 
 interface IState {
     name?: string;
@@ -183,6 +184,9 @@ export default class Login extends Component<any, IState> {
 
         core.client.connect(async () => {
             if (this.state.name && this.state.password) {
+                NetUser.subscribePushChatUserStatus();
+                NetMessage.subscribePushMessage();
+
                 const rep = await NetUser.login({
                     nickname: this.state.name,
                     password: this.state.password,

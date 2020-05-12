@@ -192,6 +192,32 @@ export default class DBUser {
         });
     }
 
+    public static async getWithUid(db: DataBase, uid: number): Promise<ChatUser | undefined> {
+        return new Promise((resolve, reject) => {
+            if (db.db) {
+                db.db.get(`SELECT * FROM ${DB_TABLE_USER} WHERE uid = ${uid}`, (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        if (row) {
+                            const chatUser = new ChatUser();
+                            chatUser.uid = row.uid;
+                            chatUser.nickname = row.name;
+                            chatUser.password = row.password;
+                            chatUser.loginTime = row.loginTime;
+                            chatUser.logoutTime = row.logoutTime;
+                            resolve(chatUser);
+                        } else {
+                            resolve();
+                        }
+                    }
+                });
+            } else {
+                reject(new Error("No sqlite db"));
+            }
+        });
+    }
+
     /**
      * 登录/注册
      */
@@ -240,6 +266,6 @@ export default class DBUser {
                     }
                 );
             }
-        })
+        });
     }
 }

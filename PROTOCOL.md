@@ -4,13 +4,15 @@
 
 ## I. Data Struct
 
-### ChatUser
+### IChatUser
 
 ```TypeScript
-interface {
+interface IChatUser {
     uid: number; // id
     nickname: string; // 昵称
     password: string; // 密码
+    loginTime: number; // 登录时间
+    logoutTime: number; // 登出时间
 }
 ```
 
@@ -31,7 +33,7 @@ interface IChatMessage {
 interface IChatRoom {
     roomId: number;
     roomName: string;
-    onlineUsers: ChatUser[];
+    onlineUsers: IChatUser[];
 }
 ```
 
@@ -88,7 +90,7 @@ interface RequestLogin {
 }
 
 interface ResponseLogin {
-    chatUser?: ChatUser; // 成功有值
+    chatUser?: IChatUser; // 成功有值
     errString?: string; // 不成功有值, 错误原因
 }
 ```
@@ -170,7 +172,7 @@ enum ChatUserStatus {
 }
 
 interface RequestPushChatUserStatus {
-    chatUser: ChatUser;
+    chatUser: IChatUser;
     status: ChatUserStatus;
 }
 ```
@@ -183,5 +185,17 @@ interface RequestGetRoomInfo {
 
 interface ResponseGetRoomInfo {
     room: IChatRoom;
+}
+```
+
+### 请求用户信息 getUserInfo
+
+```TypeScript
+interface RequestGetUserInfo {
+    uid: number;
+}
+
+interface ResponseGetUserInfo {
+    chatUser?: IChatUser;
 }
 ```
