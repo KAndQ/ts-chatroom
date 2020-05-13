@@ -4,9 +4,9 @@
  * @date 2020.05.13
  */
 
-import React, { Component } from "react";
-import { ChatMessageElemUnion, ChatMessageElemText } from "./ProtocolTypes";
-import StringUtils from "../utils/StringUtils";
+import { Component } from "react";
+import { ChatMessageElemUnion, ChatMessageElemText } from "../../model/ProtocolTypes";
+import StringUtils from "../../utils/StringUtils";
 
 export default class ChatRoomMessageText extends Component<{ elem: ChatMessageElemUnion }, any> {
     render() {

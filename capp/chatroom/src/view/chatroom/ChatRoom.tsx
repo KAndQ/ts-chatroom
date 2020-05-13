@@ -17,7 +17,7 @@ const { Header, Footer, Sider, Content } = Layout;
 export default class ChatRoom extends Component {
     componentDidMount() {
         NetRoom.getRoomInfo();
-        NetMessage.pullMessages();
+        NetMessage.pullMessages(true);
     }
 
     render() {

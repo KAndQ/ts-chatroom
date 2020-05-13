@@ -5,72 +5,50 @@
  */
 
 import React, { Component } from "react";
-import {
-    IChatMessage,
-    ChatMessageElemUnion,
-    ChatMessageElemType,
-    ChatMessageElemText,
-    IChatUser,
-} from "../../model/ProtocolTypes";
+import { IChatMessage, ChatMessageElemUnion, ChatMessageElemType } from "../../model/ProtocolTypes";
 import core from "../../model/Core";
 import moment from "moment";
-import NetUser from "../../net/NetUser";
-import { UserOutlined } from "@ant-design/icons";
 import { EVENT_PULL_MESSAGES, EVENT_PUSH_MESSAGE } from "../../model/Events";
-import ChatRoomMessageText from "../../model/ChatRoomMessageText";
-
-class ChatRoomMessageHead extends Component<{ uid: number }, { chatUser?: IChatUser }> {
-    constructor(props: any) {
-        super(props);
-        this.state = {};
-    }
-
-    async componentDidMount() {
-        const chatUser = await NetUser.getUserInfo({ uid: this.props.uid });
-        if (chatUser) {
-            this.setState({ chatUser });
-        }
-    }
-
-    render() {
-        return (
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 100,
-                }}>
-                <UserOutlined />
-                {this.state.chatUser ? this.state.chatUser.nickname : this.props.uid}
-            </div>
-        );
-    }
-}
+import ChatRoomMessageText from "./ChatRoomMessageText";
+import ChatRoomMessageHead from "./ChatRoomMessageHead";
+import NetMessage from "../../net/NetMessage";
+import { Spin } from "antd";
+import Consts from "../../const/Consts";
 
 interface IState {
     messages: IChatMessage[];
+    spinning: boolean;
 }
 
 export default class ChatRoomMessages extends Component<any, IState> {
     constructor(props: any) {
         super(props);
-        this.state = {
-            messages: core.store.messages.slice(),
-        };
 
-        this.onUpdateMessages = this.onUpdateMessages.bind(this);
+        const messages = core.store.messages.slice();
+        if (messages.length > 0) {
+            this.state = {
+                messages,
+                spinning: false,
+            };
+        } else {
+            this.state = {
+                messages,
+                spinning: true,
+            };
+        }
+
+        this.onPullMessages = this.onPullMessages.bind(this);
+        this.onPushMessage = this.onPushMessage.bind(this);
     }
 
     componentDidMount() {
-        core.on(EVENT_PULL_MESSAGES, this.onUpdateMessages);
-        core.on(EVENT_PUSH_MESSAGE, this.onUpdateMessages);
+        core.on(EVENT_PULL_MESSAGES, this.onPullMessages);
+        core.on(EVENT_PUSH_MESSAGE, this.onPushMessage);
     }
 
     componentWillUnmount() {
-        core.off(EVENT_PULL_MESSAGES, this.onUpdateMessages);
-        core.off(EVENT_PUSH_MESSAGE, this.onUpdateMessages);
+        core.off(EVENT_PULL_MESSAGES, this.onPullMessages);
+        core.off(EVENT_PUSH_MESSAGE, this.onPushMessage);
     }
 
     render() {
@@ -102,20 +80,31 @@ export default class ChatRoomMessages extends Component<any, IState> {
         });
 
         return (
-            <div
-                style={{
-                    overflow: "auto",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    height: 600,
-                }}
-                ref={(elem) => {
-                    this.m_divElem = elem;
-                }}>
-                {messageDivs}
-            </div>
+            <Spin spinning={this.state.spinning}>
+                <div
+                    style={{
+                        overflow: "auto",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                        height: 600,
+                    }}
+                    ref={(elem) => {
+                        this.m_divElem = elem;
+                    }}
+                    onWheel={(e) => {
+                        const div = e.currentTarget;
+                        const deltaY = e.deltaY;
+                        if (deltaY < 0) {
+                            if (div.scrollTop === 0) {
+                                this.pullMessages();
+                            }
+                        }
+                    }}>
+                    {messageDivs}
+                </div>
+            </Spin>
         );
     }
 
@@ -165,7 +154,7 @@ export default class ChatRoomMessages extends Component<any, IState> {
                             justifyContent: isMyself ? "flex-end" : "flex-start",
                             alignItems: "flex-start",
                             wordBreak: "break-all",
-                            textAlign: "start"
+                            textAlign: "start",
                         }}>
                         <ChatRoomMessageText elem={elem} />
                     </div>
@@ -175,24 +164,61 @@ export default class ChatRoomMessages extends Component<any, IState> {
         }
     }
 
-    private onUpdateMessages() {
+    private setMessages() {
         const messages = core.store.messages.slice();
         this.setState({
-            messages: messages,
+            messages,
         });
+    }
 
+    private onPullMessages(isFirst: boolean) {
+        this.setMessages();
+        if (isFirst) {
+            this.scrollToEnd();
+        }
+
+        const elapse = Date.now() - this.m_requestTimestamp;
+        if (elapse >= Consts.PULL_MESSAGES_FIXED_WAIT_TIME) {
+            this.setState({
+                spinning: false,
+            });
+        } else {
+            setTimeout(() => {
+                this.setState({
+                    spinning: false,
+                });
+            }, Consts.PULL_MESSAGES_FIXED_WAIT_TIME - elapse);
+        }
+    }
+
+    private onPushMessage() {
+        this.setMessages();
         this.scrollToEnd();
     }
 
     private scrollToEnd() {
         if (this.m_divElem) {
             const scrollHeight = this.m_divElem.scrollHeight; //里面 div 的实际高度
-            const height = this.m_divElem.clientHeight; // 网页可见高度
+            const height = this.m_divElem.clientHeight; // 实际可见高度
             const maxScrollTop = scrollHeight - height;
             this.m_divElem.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
             //如果实际高度大于可见高度，说明是有滚动条的，则直接把网页被卷去的高度设置为两个div的高度差，实际效果就是滚动到底部了。
         }
     }
 
+    private pullMessages() {
+        if (this.state.spinning) {
+            return;
+        }
+
+        NetMessage.pullMessages();
+        this.setState({
+            spinning: true,
+        });
+
+        this.m_requestTimestamp = Date.now();
+    }
+
     private m_divElem: any;
+    private m_requestTimestamp: number = 0;
 }

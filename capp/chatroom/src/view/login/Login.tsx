@@ -198,7 +198,6 @@ export default class Login extends Component<any, IState> {
                         loading: false,
                     });
                 } else {
-                    core.defaultUser = rep.chatUser;
                     core.emit(EVENT_CHANGE_SCENE, SceneName.ChatRoom);
                 }
             } else {

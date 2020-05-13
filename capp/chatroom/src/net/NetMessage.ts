@@ -35,8 +35,9 @@ export default class NetMessage {
     /**
      * 从服务器拉取历史消息数据
      */
-    public static async pullMessages(mid?: number): Promise<IChatMessage[]> {
+    public static async pullMessages(isFirst?: boolean): Promise<IChatMessage[]> {
         return new Promise((resolve) => {
+            const mid = core.store.messages.length > 0 ? core.store.messages[0].mid : undefined;
             core.client.request(
                 "pullMessages",
                 { mid, count: Consts.PULL_MESSAGES_MAX_COUNT },
@@ -44,8 +45,8 @@ export default class NetMessage {
                     resp.messages.forEach((m) => {
                         core.store.messages.splice(0, 0, m);
                     });
-                    core.emit(EVENT_PULL_MESSAGES);
-                    resolve(resp.messages);
+                    core.emit(EVENT_PULL_MESSAGES, isFirst);
+                    resolve(resp.messages,);
                 }
             );
         });
