@@ -217,7 +217,7 @@ export default class ChatRoom {
     private m_uid2Users: Map<number, ChatUser> = new Map();
     private m_id2Users: Map<string, ChatUser> = new Map();
     private m_id2Clients: Map<string, ChatClient> = new Map();
-    private m_roomName: string = "寄叶部队-O2组";
-    private m_roomId: number = 7;
+    private m_roomName: string = "O2 创建的房间";
+    private m_roomId: number = 2;
     private m_session: number = 0;
 }

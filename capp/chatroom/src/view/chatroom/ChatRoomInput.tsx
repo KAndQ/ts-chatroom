@@ -53,14 +53,18 @@ export default class ChatRoomInput extends Component<any, { text: string }> {
                     <Button
                         type="primary"
                         onClick={() => {
-                            NetMessage.sendText(this.state.text).then((value) => {
-                                if (value) {
-                                    console.log("Congratulation! Send success!");
-                                } else {
-                                    message.error("消息发送失败");
-                                }
-                            });
-                            this.setState({ text: "" });
+                            if (this.state.text === "") {
+                                message.info("无法检索到消息实体");
+                            } else {
+                                NetMessage.sendText(this.state.text).then((value) => {
+                                    if (value) {
+                                        console.log("Congratulation! Send success!");
+                                    } else {
+                                        message.error("消息发送失败");
+                                    }
+                                });
+                                this.setState({ text: "" });
+                            }
                         }}>
                         发送
                     </Button>
