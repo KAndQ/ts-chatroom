@@ -65,6 +65,7 @@ export default class ChatRoomTitle extends Component<any, IState> {
                     }}>{`${this.state.roomName}(我是: `}</span><span style={{
                         color: "#FFFFFF",
                         fontWeight: "bold",
+                        paddingLeft: 4,
                     }}>{this.state.userName})</span>
             </div>
         );

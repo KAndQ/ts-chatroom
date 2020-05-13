@@ -44,7 +44,7 @@ export default class NetMessage {
                     resp.messages.forEach((m) => {
                         core.store.messages.splice(0, 0, m);
                     });
-                    core.emit(EVENT_PULL_MESSAGES, isFirst);
+                    core.emit(EVENT_PULL_MESSAGES, isFirst, resp.messages.length);
                     resolve(resp.messages,);
                 }
             );

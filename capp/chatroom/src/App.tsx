@@ -50,7 +50,15 @@ class App extends Component<any, IState> {
         }
 
         return (
-            <div className="App">
+            <div
+                className="App"
+                style={{
+                    height: "100%",
+                    width: 750,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}>
                 {this.state.alert ? (
                     <Alert message={this.state.alert.text} type={this.state.alert.type} />
                 ) : null}

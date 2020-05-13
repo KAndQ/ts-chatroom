@@ -4,11 +4,17 @@
  * @date 2020.05.13
  */
 
-import { Component } from "react";
+import React, { Component } from "react";
 import { ChatMessageElemUnion, ChatMessageElemText } from "../../model/ProtocolTypes";
 
 export default class ChatRoomMessageText extends Component<{ elem: ChatMessageElemUnion }, any> {
     render() {
-        return (this.props.elem as ChatMessageElemText).text;
+        return (
+            <span
+                dangerouslySetInnerHTML={{
+                    __html: (this.props.elem as ChatMessageElemText).text.replace(/\n/g, "<br />"),
+                }}
+            />
+        );
     }
 }

@@ -12,7 +12,7 @@ import { EVENT_PULL_MESSAGES, EVENT_PUSH_MESSAGE } from "../../model/Events";
 import ChatRoomMessageText from "./ChatRoomMessageText";
 import ChatRoomMessageHead from "./ChatRoomMessageHead";
 import NetMessage from "../../net/NetMessage";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import Consts from "../../const/Consts";
 
 interface IState {
@@ -171,10 +171,14 @@ export default class ChatRoomMessages extends Component<any, IState> {
         });
     }
 
-    private onPullMessages(isFirst: boolean) {
+    private onPullMessages(isFirst: boolean, count: number) {
         this.setMessages();
         if (isFirst) {
             this.scrollToEnd();
+        } else {
+            if (count === 0) {
+                message.info("已经没有更多的历史消息了");
+            }
         }
 
         const elapse = Date.now() - this.m_requestTimestamp;
