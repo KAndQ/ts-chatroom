@@ -17,6 +17,7 @@ import moment from "moment";
 import NetUser from "../../net/NetUser";
 import { UserOutlined } from "@ant-design/icons";
 import { EVENT_PULL_MESSAGES, EVENT_PUSH_MESSAGE } from "../../model/Events";
+import ChatRoomMessageText from "../../model/ChatRoomMessageText";
 
 class ChatRoomMessageHead extends Component<{ uid: number }, { chatUser?: IChatUser }> {
     constructor(props: any) {
@@ -109,6 +110,9 @@ export default class ChatRoomMessages extends Component<any, IState> {
                     justifyContent: "flex-start",
                     alignItems: "center",
                     height: 600,
+                }}
+                ref={(elem) => {
+                    this.m_divElem = elem;
                 }}>
                 {messageDivs}
             </div>
@@ -155,13 +159,15 @@ export default class ChatRoomMessages extends Component<any, IState> {
                 return (
                     <div
                         style={{
-                            width: 360,
+                            width: 500,
                             display: "flex",
                             flexDirection: "row",
                             justifyContent: isMyself ? "flex-end" : "flex-start",
-                            alignItems: "center",
+                            alignItems: "flex-start",
+                            wordBreak: "break-all",
+                            textAlign: "start"
                         }}>
-                        {(elem as ChatMessageElemText).text}
+                        <ChatRoomMessageText elem={elem} />
                     </div>
                 );
             default:
@@ -174,5 +180,19 @@ export default class ChatRoomMessages extends Component<any, IState> {
         this.setState({
             messages: messages,
         });
+
+        this.scrollToEnd();
     }
+
+    private scrollToEnd() {
+        if (this.m_divElem) {
+            const scrollHeight = this.m_divElem.scrollHeight; //里面 div 的实际高度
+            const height = this.m_divElem.clientHeight; // 网页可见高度
+            const maxScrollTop = scrollHeight - height;
+            this.m_divElem.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+            //如果实际高度大于可见高度，说明是有滚动条的，则直接把网页被卷去的高度设置为两个div的高度差，实际效果就是滚动到底部了。
+        }
+    }
+
+    private m_divElem: any;
 }
