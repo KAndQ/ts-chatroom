@@ -6,8 +6,8 @@
 
 import React, { Component } from "react";
 import { IChatUser } from "../../model/ProtocolTypes";
-import NetUser from "../../net/NetUser";
 import { UserOutlined } from "@ant-design/icons";
+import core from "../../model/Core";
 
 export default class ChatRoomMessageHead extends Component<{ uid: number }, { chatUser?: IChatUser }> {
     constructor(props: any) {
@@ -16,7 +16,7 @@ export default class ChatRoomMessageHead extends Component<{ uid: number }, { ch
     }
 
     async componentDidMount() {
-        const chatUser = await NetUser.getUserInfo({ uid: this.props.uid });
+        const chatUser = await core.chatUserCache.get(this.props.uid);
         if (chatUser && !this.m_isUnmount) {
             this.setState({ chatUser });
         }

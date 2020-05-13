@@ -14,7 +14,6 @@ import {
 } from "../model/ProtocolTypes";
 import Consts from "../const/Consts";
 import { EVENT_PULL_MESSAGES, EVENT_PUSH_MESSAGE } from "../model/Events";
-import StringUtils from "../utils/StringUtils";
 
 export default class NetMessage {
     /**
@@ -24,7 +23,7 @@ export default class NetMessage {
         return new Promise((resolve) => {
             core.client.request(
                 "sendMessage",
-                { elem: { elemType: ChatMessageElemType.TEXT, text: StringUtils.encodeToBase64(text) } },
+                { elem: { elemType: ChatMessageElemType.TEXT, text: text } },
                 (resp: ResponseSendMessage) => {
                     resolve(resp.success);
                 }

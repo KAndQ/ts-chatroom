@@ -9,6 +9,7 @@ import Consts from "../const/Consts";
 import { NetPackage } from "../model/ProtocolTypes";
 import Dev from "../utils/Dev";
 import * as binconv from "binconv";
+import utf8 from "utf8";
 
 interface RespCallback {
     (res: any): void;
@@ -131,7 +132,7 @@ export default class NetClient {
             session: ++this.m_session,
             request: req,
         };
-        const strjson = JSON.stringify(netPackage);
+        const strjson = utf8.encode(JSON.stringify(netPackage));
         Dev.print("NetClient Send", strjson);
         this.sendString(strjson);
 
