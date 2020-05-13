@@ -48,7 +48,11 @@ export default class NetClient {
 
         this.m_sock.on("error", (error: Error) => {});
 
-        this.m_sock.on("disconnect", (reason: string) => {});
+        this.m_sock.on("disconnect", (reason: string) => {
+            this.m_sock = io(Consts.SOCKET_IO_HOST, {
+                autoConnect: false,
+            });
+        });
 
         this.m_sock.on("reconnect", (attemptNumber: number) => {});
 
@@ -177,6 +181,13 @@ export default class NetClient {
                 }
             }
         }, 0);
+    }
+
+    public close() {
+        this.m_sock.close();
+        this.m_sock = this.m_sock = io(Consts.SOCKET_IO_HOST, {
+            autoConnect: false,
+        });
     }
 
     private m_sock: SocketIOClient.Socket;

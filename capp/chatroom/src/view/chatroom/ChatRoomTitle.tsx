@@ -11,21 +11,29 @@ import { EVENT_UPDATE_ROOM_INFO } from "../../model/Events";
 interface IState {
     roomId: number;
     roomName: string;
+    userName: string;
 }
 
 export default class ChatRoomTitle extends Component<any, IState> {
     constructor(props: any) {
         super(props);
 
+        let userName = "";
+        if (core.store.myself) {
+            userName = core.store.myself.nickname;
+        }
+
         if (core.store.chatRoom) {
             this.state = {
                 roomId: core.store.chatRoom.roomId,
                 roomName: core.store.chatRoom.roomName,
+                userName,
             };
         } else {
             this.state = {
                 roomId: 0,
                 roomName: "",
+                userName,
             };
         }
 
@@ -54,7 +62,10 @@ export default class ChatRoomTitle extends Component<any, IState> {
                 <span
                     style={{
                         color: "#FFFFFF",
-                    }}>{`${this.state.roomName}(ID: ${this.state.roomId})`}</span>
+                    }}>{`${this.state.roomName}(我是: `}</span><span style={{
+                        color: "#FFFFFF",
+                        fontWeight: "bold",
+                    }}>{this.state.userName})</span>
             </div>
         );
     }

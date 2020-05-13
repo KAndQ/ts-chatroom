@@ -197,6 +197,8 @@ export default class Login extends Component<any, IState> {
                     this.setState({
                         loading: false,
                     });
+
+                    core.client.close();
                 } else {
                     core.emit(EVENT_CHANGE_SCENE, SceneName.ChatRoom);
                 }

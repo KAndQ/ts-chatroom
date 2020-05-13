@@ -1,22 +1,24 @@
 {
-  "name": "chatroom",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@types/koa": "^2.11.3",
-    "@types/node": "^13.13.4",
-    "@types/socket.io": "^2.1.4",
-    "@types/sqlite3": "^3.1.6",
-    "@types/ws": "^7.2.4",
-    "koa": "^2.11.0",
-    "socket.io": "^2.3.0",
-    "sqlite3": "^4.2.0",
-    "ws": "^7.2.5"
-  }
+    "name": "chatroom",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "launch": "pm2 start build/App.js",
+        "stop": "pm2 stop App"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/koa": "^2.11.3",
+        "@types/node": "^13.13.4",
+        "@types/socket.io": "^2.1.4",
+        "@types/sqlite3": "^3.1.6",
+        "@types/ws": "^7.2.4",
+        "koa": "^2.11.0",
+        "socket.io": "^2.3.0",
+        "sqlite3": "^4.2.0",
+        "ws": "^7.2.5"
+    }
 }
