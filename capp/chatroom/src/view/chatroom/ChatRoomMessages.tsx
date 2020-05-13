@@ -51,6 +51,16 @@ export default class ChatRoomMessages extends Component<any, IState> {
         core.off(EVENT_PUSH_MESSAGE, this.onPushMessage);
     }
 
+    componentDidUpdate() {
+        if (this.m_divElemModify) {
+            this.m_divElemModify = false;
+
+            if (this.m_divElem) {
+                this.m_divElem.scrollTop = this.m_divElem.scrollHeight - this.m_divElemHeight;
+            }
+        }
+    }
+
     render() {
         const messageDivs: any = [];
         this.state.messages.forEach((v, index) => {
@@ -164,7 +174,12 @@ export default class ChatRoomMessages extends Component<any, IState> {
         }
     }
 
-    private setMessages() {
+    private setMessages(isFirst?: boolean) {
+        if (!isFirst && this.m_divElem) {
+            this.m_divElemHeight = this.m_divElem.scrollHeight;
+            this.m_divElemModify = true;
+        }
+
         const messages = core.store.messages.slice();
         this.setState({
             messages,
@@ -172,7 +187,7 @@ export default class ChatRoomMessages extends Component<any, IState> {
     }
 
     private onPullMessages(isFirst: boolean, count: number) {
-        this.setMessages();
+        this.setMessages(isFirst);
         if (isFirst) {
             this.scrollToEnd();
         } else {
@@ -223,6 +238,8 @@ export default class ChatRoomMessages extends Component<any, IState> {
         this.m_requestTimestamp = Date.now();
     }
 
-    private m_divElem: any;
+    private m_divElem: HTMLDivElement | null = null;
+    private m_divElemHeight: number = 0;
+    private m_divElemModify: boolean = false;
     private m_requestTimestamp: number = 0;
 }

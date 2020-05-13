@@ -54,7 +54,7 @@ class App extends Component<any, IState> {
                 className="App"
                 style={{
                     height: "100%",
-                    width: 750,
+                    width: 900,
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",

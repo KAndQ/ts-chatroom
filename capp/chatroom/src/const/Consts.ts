@@ -7,5 +7,5 @@
 export default class Consts {
     public static SOCKET_IO_HOST = "http://localhost:48081/";
     public static PULL_MESSAGES_MAX_COUNT = 32;
-    public static PULL_MESSAGES_FIXED_WAIT_TIME = 2000;
+    public static PULL_MESSAGES_FIXED_WAIT_TIME = 1500;
 }
