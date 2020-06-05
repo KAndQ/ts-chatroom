@@ -951,8 +951,6 @@ let routes = (
 
 当你在 `<Switch>` 中包含 `<Redirect>`, 它能够使用 `<Route>` 的任意位置匹配属性: path, exact, strict. from 属性只是 path 的别名.
 
-If a location prop is given to the <Switch>, it will override the location prop on the matching child element.
-
 如果 `<Switch>` 设置了 location 属性, 它将覆盖匹配子节点的 location 属性.
 
 ```javascript
