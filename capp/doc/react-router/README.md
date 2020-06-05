@@ -863,3 +863,115 @@ localion 对象, 类似于 { pathname, search, hash, state }
 注意: 在 React 16 版本之前, 必须使用一个子元素，因为呈现方法不能返回多个元素。如果需要多个元素，可以尝试将它们包装在一个额外的 `<div>` 中。
 
 ## \<Switch\>
+
+渲染第一个匹配的 `<Route>` 或者 `<Redirect>`.
+
+**这和仅仅使用一堆 `<Route>` 有什么不同?**
+
+`<Switch>` 是惟一的，因为它只呈现一个 `<Route>`。相比之下，每条 `<Route>` 匹配渲染所包含的 location。参考这些 `<Route>`:
+
+```javascript
+import { Route } from "react-router";
+
+let routes = (
+    <div>
+        <Route path="/about">
+            <About />
+        </Route>
+        <Route path="/:user">
+            <User />
+        </Route>
+        <Route>
+            <NoMatch />
+        </Route>
+    </div>
+);
+```
+
+如果 URL 是/about，则 `<About>`, `<User>` 和 `<NoMatch>` 将全部渲染，因为它们都匹配路径。这是通过设计实现的，它允许我们以多种方式在应用程序中创建路径，比如侧边栏、面包屑、引导标签等等。
+
+然而，有时我们只想选择一条路线来呈现。如果我们在 /about，我们不想匹配 /:user(或显示我们的 “404” 页面)。这里显示 `<Switch>` 是如何工作的:
+
+```javascript
+import { Route, Switch } from "react-router";
+
+let routes = (
+    <Switch>
+        <Route exact path="/">
+            <Home />
+        </Route>
+        <Route path="/about">
+            <About />
+        </Route>
+        <Route path="/:user">
+            <User />
+        </Route>
+        <Route>
+            <NoMatch />
+        </Route>
+    </Switch>
+);
+```
+
+现在, 如果我们在 /about, `<Switch>` 将开始查询一个匹配的 `<Route>`. `<Route path="/about" />` 将匹配, 并且 `<Switch>` 将停止匹配查询同时呈现 `<Abount>`. 类似的, 如果我们在 /micheal, 那么 `<User>` 将呈现.
+
+这对动画过渡也很有用，因为匹配的路径在与前一个相同的位置呈现。
+
+```javascript
+let routes = (
+    <Fade>
+        <Switch>
+            {/* there will only ever be one child here */}
+            <Route />
+            <Route />
+        </Switch>
+    </Fade>
+);
+
+let routes = (
+    <Fade>
+        {/* there will always be two children here,
+        one might render null though, making transitions
+        a bit more cumbersome to work out */}
+        <Route />
+        <Route />
+    </Fade>
+);
+```
+
+### location: object
+
+一个位置对象，用于匹配子元素，而不是当前历史位置(通常是当前浏览器 URL)。
+
+### children: node
+
+所有 `<Switch>` 的子节点应该为 `<Route>` 或者 `<Redirect>` 元素. 只有第一个匹配当前位置的子节点将被渲染.
+
+`<Route>` 元素使用它们的 path 属性匹配, `<Redirect>` 元素使用它们的 from 属性匹配. 如果 `<Route>` 没有传入 path 属性或者 `<Redirect>` 没有传入 from 属性, 那么它们将永远匹配当前的位置.
+
+当你在 `<Switch>` 中包含 `<Redirect>`, 它能够使用 `<Route>` 的任意位置匹配属性: path, exact, strict. from 属性只是 path 的别名.
+
+If a location prop is given to the <Switch>, it will override the location prop on the matching child element.
+
+如果 `<Switch>` 设置了 location 属性, 它将覆盖匹配子节点的 location 属性.
+
+```javascript
+import { Redirect, Route, Switch } from "react-router";
+
+let routes = (
+    <Switch>
+        <Route exact path="/">
+            <Home />
+        </Route>
+
+        <Route path="/users">
+            <Users />
+        </Route>
+        <Redirect from="/accounts" to="/users" />
+
+        <Route>
+            <NoMatch />
+        </Route>
+    </Switch>
+);
+```
