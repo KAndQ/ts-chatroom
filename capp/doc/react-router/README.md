@@ -754,3 +754,112 @@ ReactDOM.render(
 | /One | /one              | false     | yes       |
 
 ## \<Router\>
+
+所有路由器组件的公共低级接口。通常应用程序将使用一个高级路由器代替:
+
+-   `<BrowserRouter>`
+-   `<HashRouter>`
+-   `<MemoryRouter>`
+-   `<NativeRouter>`
+-   `<StatisRouter>`
+
+使用低级路由器最常见的用例是将自定义历史与状态管理库(如 Redux 或 Mobx)同步。请注意，在使用状态管理库和 React Router 时并不需要这样做，它只用于深度集成。
+
+### history: object
+
+用于导航的历史记录对象。
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { createBrowserHistory } from "history";
+
+const customHistory = createBrowserHistory();
+
+ReactDOM.render(<Router history={customHistory} />, node);
+```
+
+### children: node
+
+要呈现的子元素。
+
+## \<StaticRouter\>
+
+从不改变 location 的路由器.
+
+这在服务器端渲染场景中非常有用, 当用户没有实际点击时，以至于 location 对象实际上不会改变。因此，名称为:静态。它也可以用在简单的测试中，当您只需要插入一个位置并对呈现输出进行断言时，它也很有用。
+
+```javascript
+import http from "http";
+import React from "react";
+import ReactDOMServer from "react-dom/server";
+import { StaticRouter } from "react-router";
+
+http.createServer((req, res) => {
+    // This context object contains the results of the render
+    const context = {};
+
+    const html = ReactDOMServer.renderToString(
+        <StaticRouter location={req.url} context={context}>
+            <App />
+        </StaticRouter>
+    );
+
+    // context.url will contain the URL to redirect to if a <Redirect> was used
+    if (context.url) {
+        res.writeHead(302, {
+            Location: context.url,
+        });
+        res.end();
+    } else {
+        res.write(html);
+        res.end();
+    }
+}).listen(3000);
+```
+
+### basename: string
+
+所有位置的基 URL。正确格式化的 basename 应该有一个前导斜杠，但没有结尾斜杠。
+
+```javascript
+<StaticRouter basename="/calendar">
+    <Link to="/today"/> // renders <a href="/calendar/today">
+</StaticRouter>
+```
+
+### location: string
+
+服务器接收到的 URL, 一般情况下是 node 服务器的 `req.url`.
+
+```javascript
+<StaticRouter location={req.url}>
+    <App />
+</StaticRouter>
+```
+
+### location: object
+
+localion 对象, 类似于 { pathname, search, hash, state }
+
+```javascript
+<StaticRouter location={{ pathname: "/bubblegum" }}>
+    <App />
+</StaticRouter>
+```
+
+### context: object
+
+一个普通的 JavaScript 对象。在呈现期间，组件可以向对象添加属性以存储有关呈现的信息。
+
+当一个 `<Route>` 匹配时，它将把 context 对象传递给它呈现为 staticContext 属性的组件。查看服务器呈现指南，了解关于如何自己完成此操作的更多信息。
+
+在呈现之后，这些属性可用于配置服务器的响应。
+
+### children: node
+
+要呈现的子元素。
+
+注意: 在 React 16 版本之前, 必须使用一个子元素，因为呈现方法不能返回多个元素。如果需要多个元素，可以尝试将它们包装在一个额外的 `<div>` 中。
+
+## \<Switch\>
