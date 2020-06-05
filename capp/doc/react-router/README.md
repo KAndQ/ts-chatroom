@@ -507,3 +507,250 @@ Defaults to "page".
 匹配从区分大小写, 相当于 Route.sensitive.
 
 ## \<Route\>
+
+路由组件可能是反应路由器中最重要的组件，了解和学习使用好。它最基本的职责是在路径匹配当前 URL 时呈现某个 UI。
+
+考虑以下代码:
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+
+ReactDOM.render(
+    <Router>
+        <div>
+            <Route exact path="/">
+                <Home />
+            </Route>
+            <Route path="/news">
+                <NewsFeed />
+            </Route>
+        </div>
+    </Router>,
+    node
+);
+```
+
+如果应用程序的位置是 `/`，那么 UI 层次结构将如下:
+
+```javascript
+<div>
+    <Home />
+    <!-- react-empty: 2 -->
+</div>
+```
+
+如果 app 的位置是 `/news`，那么 UI 层次结构为:
+
+```javascript
+<div>
+    <!-- react-empty: 1 -->
+    <NewsFeed />
+</div>
+```
+
+"react-empty" 注释只是 React null 呈现的实现细节. 但就我们的目的而言，它是有益的。路由在技术上总是“呈现”的，即使它的呈现为空。当 `<Router>` 的路径匹配当前的 URL, 它将渲染它的孩子(你的组件).
+
+如果在组件树的同一点上，同一个组件作为多个 `<Route>` 的子组件使用，React 会将其视为相同的组件实例，并且在路由更改之间，组件的状态将被保留。
+如果不需要这样做，添加到每个路由组件的唯一 key 属性将导致在路由更改时响应, 重新创建组件实例。
+
+### Route render methods
+
+推荐的渲染方法是将需要渲染的内容作为一个 `<Route>`的子元素, 如上所述. 但是，`<Route>` 还有一些其他的方法可以用来渲染。它们主要是为支持应用程序而提供的，这些应用程序是在引入钩子之前用早期版本的路由器构建的。
+
+-   `<Route component>`
+-   `<Route render>`
+-   `<Route children> function`
+
+你应该只使用这些属性的其中一种方法. 看看下面他们的解释，了解他们之间的区别。
+
+### Route props
+
+所有的渲染方法都将传递这三个路由属性.
+
+-   match
+-   location
+-   history
+
+### component
+
+一个 React 组件, 只在 location 匹配的时候才会被渲染. 它将使用 route props 属性渲染.
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+
+// All route props (match, location and history) are available to User
+function User(props) {
+    return <h1>Hello {props.match.params.username}!</h1>;
+}
+
+ReactDOM.render(
+    <Router>
+        <Route path="/user/:username" component={User} />
+    </Router>,
+    node
+);
+```
+
+当你使用 component 方法(而不是 render 或 children，如上)时, 路由器从给定的组件使用 `React.createElement` 创建新的 React 元素. 这意味着如果您为组件属性提供内联函数，那么您将在每次呈现时创建一个新组件。这将导致现有组件卸载和新组件挂载，而不仅仅是更新现有组件。当使用内联函数进行内联呈现时，请使用 render 或 children (如下)。
+
+### render: func
+
+这样就可以方便地进行内联呈现和包装，而不需要进行上面解释的重新加载。
+
+不用使用 component 属性为您创建一个新的 React 元素，您可以传入一个函数，以便在位置匹配时调用。render 属性功能可以访问所有与组件渲染属性相同的 route props(match, location 和 history)。
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+
+// convenient inline rendering
+ReactDOM.render(
+    <Router>
+        <Route path="/home" render={() => <div>Home</div>} />
+    </Router>,
+    node
+);
+
+// wrapping/composing
+// You can spread routeProps to make them available to your rendered Component
+function FadingRoute({ component: Component, ...rest }) {
+    return (
+        <Route
+            {...rest}
+            render={(routeProps) => (
+                <FadeIn>
+                    <Component {...routeProps} />
+                </FadeIn>
+            )}
+        />
+    );
+}
+
+ReactDOM.render(
+    <Router>
+        <FadingRoute path="/cool" component={Something} />
+    </Router>,
+    node
+);
+```
+
+**警告**: `<Route component>` 优先于 `<Route render>`, 所以不要在相同的 `<Route>` 中两者都使用.
+
+### children: func
+
+有时无论 location 是否匹配, 你都需要渲染. 在这些情况下，可以使用 children prop 函数。它的工作方式和 render 完全一样，除了不管匹配与否, 它都会被调用。
+
+children prop 接收所有与 component 和 render 方法相同的 route props，除非路由无法匹配 URL，那么 match 为 null。这允许根据路由是否匹配动态调整 UI。这里，如果路由匹配，我们将添加一个激活的类.
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+
+function ListItemLink({ to, ...rest }) {
+    return (
+        <Route
+            path={to}
+            children={({ match }) => (
+                <li className={match ? "active" : ""}>
+                    <Link to={to} {...rest} />
+                </li>
+            )}
+        />
+    );
+}
+
+ReactDOM.render(
+    <Router>
+        <ul>
+            <ListItemLink to="/somewhere" />
+            <ListItemLink to="/somewhere-else" />
+        </ul>
+    </Router>,
+    node
+);
+```
+
+这对动画也很有用
+
+```javascript
+<Route
+    children={({ match, ...rest }) => ({
+        /* Animate will always render, so you can use lifecycles
+        to animate its child in and out */
+    }
+    <Animate>
+        {match && <Something {...rest}/>}
+    </Animate>
+    )}
+/>
+```
+
+**警告**: `<Route children>` 优先于 `<Route component>` 和 `<Route render>`, 所以在同一个 `<Route>` 只需要使用其中一种方法就可以了.
+
+### path: string | string[]
+
+任何有效的 URL 路径或者路径数组, 需要能够被 `path-to-regexp@^1.7.0` 模块识别.
+
+没有路径的路由总是匹配的。
+
+```javascript
+<Route path="/users/:id">
+    <User />
+</Route>
+<Route path={["/users/:id", "/profile/:id"]}>
+    <User />
+</Route>
+```
+
+### exact: bool
+
+为 true 时, 路径必须与 location.pathname 完全匹配.
+
+| path | location.pathname | exact | matches\? |
+| ---- | ----------------- | ----- | --------- |
+| /one | /one/two          | true  | no        |
+| /one | /one/two          | false | yes       |
+
+### strict: bool
+
+为 true 时, 末尾带有斜杠的路径只会匹配末尾带有斜杠的 location.pathname. 当 location.pathname 名中有额外的 URL 段时，这将不起作用。
+
+| path  | location.pathname | matches\? |
+| ----- | ----------------- | --------- |
+| /one/ | /one              | no        |
+| /one/ | /one/             | yes       |
+| /one/ | /one/two          | yes       |
+
+**警告**: strict 可用于强制路径名末尾没有斜杠，但为了做到这一点，strict 和 exact 都必须为真。
+
+| path | location.pathname | matches\? |
+| ---- | ----------------- | --------- |
+| /one | /one              | yes       |
+| /one | /one/             | no        |
+| /one | /one/two          | no        |
+
+### location: object
+
+`<Route>` 元素尝试将其路径与当前历史位置(通常是当前浏览器 URL)匹配。但是，也可以传递具有不同路径名的位置以进行匹配。
+
+常常用于当 `<Route>` 需要匹配一个当前历史位置以外的位置时, 如动画转换示例所示。
+
+如果一个 `<Route>` 元素被 `<Switch>` 包裹, 并且匹配传递给的 `<Switch>` 的位置(或当前历史位置), 那么传递给 `<Route>` 的位置属性将被 `<Switch>` 所使用的覆盖.(这里)
+
+### sensitive: bool
+
+当为 true 时，将匹配是否区分大小写的路径。
+
+| path | location.pathname | sensitive | matches\? |
+| ---- | ----------------- | --------- | --------- |
+| /one | /one              | true      | yes       |
+| /One | /one              | true      | no        |
+| /One | /one              | false     | yes       |
+
+## \<Router\>
