@@ -8,6 +8,7 @@ import React, { Component } from "react";
 import { Input, Button, message } from "antd";
 import NetMessage from "../../net/NetMessage";
 import { SmileOutlined } from "@ant-design/icons";
+import Dev from "../../utils/Dev";
 const { TextArea } = Input;
 
 export default class ChatRoomInput extends Component<any, { text: string }> {
@@ -34,7 +35,7 @@ export default class ChatRoomInput extends Component<any, { text: string }> {
                             fontSize: 24,
                         }}
                         onClick={() => {
-                            message.warn("TODO");
+                            Dev.TODO();
                         }}
                     />
                 </div>

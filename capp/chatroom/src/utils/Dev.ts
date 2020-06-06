@@ -4,10 +4,13 @@
  * @date 2020.04.30
  */
 
+import { message } from "antd";
+
 export default class Dev {
     /// TODO
     public static TODO(): void {
         console.warn("TODO...");
+        message.warn("TODO");
     }
 
     /// DEPRECATED

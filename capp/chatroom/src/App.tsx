@@ -2,15 +2,16 @@ import React, { Component } from "react";
 import { Alert } from "antd";
 import "./App.css";
 import core from "./model/Core";
-import { EVENT_CHANGE_SCENE, EVENT_ALERT } from "./model/Events";
-import { SceneName } from "./model/ProtocolTypes";
+import { EVENT_AUTH, EVENT_ALERT } from "./model/Events";
 import Login from "./view/login/Login";
 import ChatRoom from "./view/chatroom/ChatRoom";
+import { Switch, Route, Redirect } from "react-router-dom";
+import { IChatUser } from "./model/ProtocolTypes";
 
 type AlertType = "success" | "info" | "warning" | "error" | undefined;
 
 interface IState {
-    sceneName: SceneName;
+    myself?: IChatUser;
     alert?: {
         text: string;
         type: AlertType;
@@ -21,34 +22,23 @@ class App extends Component<any, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            sceneName: SceneName.Login,
+            myself: core.store.myself,
         };
-
-        this.onChangeScene = this.onChangeScene.bind(this);
         this.onAlert = this.onAlert.bind(this);
+        this.onAuth = this.onAuth.bind(this);
     }
 
     componentDidMount() {
-        core.on(EVENT_CHANGE_SCENE, this.onChangeScene);
         core.on(EVENT_ALERT, this.onAlert);
+        core.on(EVENT_AUTH, this.onAuth);
     }
 
     componentWillUnmount() {
-        core.off(EVENT_CHANGE_SCENE, this.onChangeScene);
-        core.on(EVENT_ALERT, this.onAlert);
+        core.off(EVENT_ALERT, this.onAlert);
+        core.off(EVENT_AUTH, this.onAuth);
     }
 
     render() {
-        let view;
-        switch (this.state.sceneName) {
-            case SceneName.Login:
-                view = <Login />;
-                break;
-            case SceneName.ChatRoom:
-                view = <ChatRoom />;
-                break;
-        }
-
         return (
             <div
                 className="App"
@@ -62,15 +52,16 @@ class App extends Component<any, IState> {
                 {this.state.alert ? (
                     <Alert message={this.state.alert.text} type={this.state.alert.type} />
                 ) : null}
-                {view}
+                <Switch>
+                    <Route exact path={["/", "/login"]}>
+                        {this.state.myself ? <Redirect to="/room" /> : <Login />}
+                    </Route>
+                    <Route path="/room">
+                        {this.state.myself ? <ChatRoom /> : <Redirect to="/login" />}
+                    </Route>
+                </Switch>
             </div>
         );
-    }
-
-    private onChangeScene(sceneName: SceneName): void {
-        this.setState({
-            sceneName,
-        });
     }
 
     private onAlert(text: string, type: AlertType): void {
@@ -79,6 +70,12 @@ class App extends Component<any, IState> {
                 text,
                 type,
             },
+        });
+    }
+
+    private onAuth(): void {
+        this.setState({
+            myself: core.store.myself ? { ...core.store.myself } : undefined,
         });
     }
 }

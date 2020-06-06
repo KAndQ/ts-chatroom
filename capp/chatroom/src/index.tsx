@@ -2,18 +2,21 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-import RouterApp from "./demo/RouterApp";
+// import RouterApp from "./demo/RouterApp";
 // import SocketIOApp from "./demo/SocketIOPingApp";
 // import WebSocketApp from "./demo/WebSocketPingApp";
 // import NetClientApp from "./demo/NetClientApp";
 // import InfiniteDivApp from "./demo/InfiniteDivApp";
 // import ReactScrollApp from "./demo/ReactScrollApp";
 import * as serviceWorker from "./serviceWorker";
+import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.render(
     // <React.StrictMode>
-    // <App />,
-    <RouterApp />,
+    <BrowserRouter>
+        <App />
+    </BrowserRouter>,
+    // <RouterApp />,
     // <NetClientApp />,
     // <SocketIOApp />,
     // <WebSocketApp />,

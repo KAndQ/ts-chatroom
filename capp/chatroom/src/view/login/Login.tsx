@@ -7,12 +7,11 @@
 import React, { Component } from "react";
 import { Button, Input, Spin, message } from "antd";
 import core from "../../model/Core";
-import { EVENT_CHANGE_SCENE } from "../../model/Events";
-import { SceneName } from "../../model/ProtocolTypes";
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
 import Dev from "../../utils/Dev";
 import NetUser from "../../net/NetUser";
 import NetMessage from "../../net/NetMessage";
+import { EVENT_AUTH } from "../../model/Events";
 
 interface IState {
     name?: string;
@@ -200,7 +199,7 @@ export default class Login extends Component<any, IState> {
 
                     core.client.close();
                 } else {
-                    core.emit(EVENT_CHANGE_SCENE, SceneName.ChatRoom);
+                    core.emit(EVENT_AUTH);
                 }
             } else {
                 message.error("不可思议!!!");
