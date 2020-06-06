@@ -973,3 +973,299 @@ let routes = (
     </Switch>
 );
 ```
+
+## history
+
+这个文档中的术语 "history" 和 "history object" 指的是 [the history package](https://github.com/ReactTraining/history)，它是 React 路由器仅有的两个主要依赖项之一(除了 React 本身之外)，它提供了几种不同的实现，用于在各种环境中用 JavaScript 管理会话历史。
+
+还可以使用以下术语:
+
+-   "browser history" - DOM 特定的实现, 用于 web, 支持 HTML5 的 history API.
+-   "hash history" - DOM 特定的实现, 适用于历史遗留的网页浏览器.
+-   "memory history" - 一个内存中的模拟实现, 用于测试和非 DOM 环境(像 React Native).
+
+history 对象通常有以下属性和方法:
+
+-   length - (number)历史堆栈中的条目数
+-   action - (string)当前的 action(PUSH, REPLACE, or POP)
+-   location - (object)当前的位置, 可能有如下属性:
+    -   pathname - (string) URL 的路径
+    -   search - (string) URL 的查询字符串
+    -   hash - (string) URL 的哈希片段
+    -   state - (object) localtion 对象特定的状态, 当 location 对象通过 push(path, state) 方法被推送到历史栈时, 会提供 state 对象, 仅在浏览器和内存历史中可用
+-   push(path, [state]) - (function)替换历史堆栈上的当前条目
+-   replace(path, [state]) - (function)替换历史堆栈上的当前条目
+-   go(n) - (function) 在历史堆栈中移动 n 个条目的指针
+-   goBack() - (function) 等效于 go(-1)
+-   goForward() - (function) 等效于 go(1)
+-   block(prompt) - (function) 防止导航(参考[the history docs](https://github.com/ReactTraining/history/blob/master/docs/Blocking.md)
+
+### history is mutable
+
+历史对象是可变的。因此，建议从 `<Route>` 的渲染属性中访问位置，而不是从 history.location。这确保了在生命周期钩子中关于 React 的假设是正确的。例如:
+
+```javascript
+class Comp extends React.Component {
+    componentDidUpdate(prevProps) {
+        // will be true
+        const locationChanged = this.props.location !== prevProps.location;
+
+        // INCORRECT, will *always* be false because history is mutable.
+        const locationChanged = this.props.history.location !== prevProps.history.location;
+    }
+}
+
+<Route component={Comp} />;
+```
+
+根据您正在使用的实现，还可能出现其他属性。请参考[历史文档](https://github.com/ReactTraining/history/tree/master/docs)以了解更多细节。
+
+## location
+
+位置表示应用程序现在的位置，你想让它去哪里，甚至是它曾经在哪里。它看起来像这样:
+
+```javascript
+{
+    key: 'ac3df4', // not with HashHistory!
+    pathname: '/somewhere',
+    search: '?some=search-string',
+    hash: '#howdy',
+    state: {
+        [userDefined]: true
+    }
+}
+```
+
+路由器会在几个地方为你提供一个位置对象:
+
+-   Route component 像 `this.props.location`
+-   Route render 像 `({ location }) => ()`
+-   Route children 像 `({ location }) => ()`
+-   withRouter 像 `this.props.location`
+
+它也出现在 history.location 上, 但是你不应该使用, 因为它是可变的. 你可以阅读更多关于 [history](https://reacttraining.com/react-router/web/api/history) 的内容.
+
+location 对象永远不会发生变化，所以可以在生命周期钩子中使用它来确定导航何时发生，这对于数据获取和动画非常有用。
+
+```javascript
+componentWillReceiveProps(nextProps) {
+    if (nextProps.location !== this.props.location) {
+        // navigated!
+    }
+}
+```
+
+您可以提供 location 对象，而不是字符串用于导航的各个地方:
+
+-   Web [Link to](https://reacttraining.com/react-router/web/api/Link/to)
+-   Native [Link to](https://reacttraining.com/react-router/native/api/Link/to)
+-   [Redirect to](https://reacttraining.com/react-router/web/api/Redirect/to)
+-   [history.push](https://reacttraining.com/react-router/web/api/history/push)
+-   [history.replace](https://reacttraining.com/react-router/web/api/history/push)
+
+通常你只使用一个字符串，但如果你需要添加一些“位置状态”，当应用程序返回到那个特定位置时，你可以使用一个位置对象。如果您想根据导航历史而不是路径(比如模态)对 UI 进行分支，这是非常有用的。
+
+```javascript
+// usually all you need
+<Link to="/somewhere"/>
+
+// but you can use a location instead
+const location = {
+  pathname: '/somewhere',
+  state: { fromDashboard: true }
+}
+
+<Link to={location}/>
+<Redirect to={location}/>
+history.push(location)
+history.replace(location)
+```
+
+最后，您可以将 location 对象传递给以下组件:
+
+-   Route
+-   Switch
+
+这将阻止他们使用实际位置在路由器的状态。这对于动画和挂起导航非常有用，或者当您想让组件在与实际不同的位置呈现时也非常有用。
+
+## match
+
+匹配对象包含了 `<Route path>` 与 URL 匹配的信息, match 对象包含以下属性:
+
+-   params - (object) 对应于路径的动态段的 URL 解析的键/值对
+-   isExact - (boolean) 如果整个 URL 已匹配(没有尾随字符)，则为真
+-   path - (string) 用于匹配的路径模式。用于构建嵌套的 `<Route>`
+-   url - (string) URL 的匹配部分。对于构建嵌套链接非常有用
+
+你可以在不同的地方匹配对象:
+
+-   Route component 像 `this.props.match`
+-   Route render 像 `({ match }) => ()`
+-   Route children 像 `({match}) => ()`
+-   withRouter 像 `this.props.match`
+-   matchPath 作为返回值
+-   useRouteMatch 作为返回值
+
+如果 `<Route>` 没有 path 参数, 那么将总是匹配, 你讲获得父组件节点的 match 对象. withRouter 也是一样.
+
+### null matches
+
+`<Route>` 使用 children 属性将调用它的 children 函数，即使路由的路径与当前位置不匹配。在这种情况下，match 对象将是 null。能够在路径匹配时渲染路径的内容是很有用的，但是这种情况会带来一些挑战。
+
+默认的 "解析" url 的方法是把 match.url 字符串添加到 "相对" 路径.
+
+```javascript
+let path = `${match.url}/relative-path`;
+```
+
+如果在匹配为 null 时尝试这样做，将以类型错误告终。这意味着在使用 children 属性时，尝试连接路由中的“相对”路径是不安全的。
+
+当在生成空匹配对象的路由中使用无路径路由时，会出现类似但更微妙的情况。
+
+```javascript
+// location.pathname = '/matches'
+<Route path="/does-not-match"
+  children={({ match }) => (
+    // match === null
+    <Route
+        render={({ match: pathlessMatch }) => (
+            // pathlessMatch === ???
+        )}
+    />
+  )}
+/>
+```
+
+无路径路由从父路由继承匹配对象。如果它们的父匹配项是 null，那么它们的匹配项也是 null。这意味着:
+
+-   a)任何子路由/链接都必须是绝对的，因为没有父路由可以解析;
+-   b)父匹配可以为 null 的无路径路由将需要使用 children 属性。
+
+## matchPath
+
+这使您可以使用 `<Route>` 在正常呈现周期之外使用的相同匹配代码，比如在服务器上呈现之前收集数据依赖项。
+
+```javascript
+import { matchPath } from "react-router";
+
+const match = matchPath("/users/123", {
+    path: "/users/:id",
+    exact: true,
+    strict: false,
+});
+```
+
+### pathname
+
+第一个参数是要匹配的路径名。如果您在服务器上使用 Node.js，应该是 req.path。
+
+### props
+
+第二个参数是要匹配的属性，它们与 `<Route>` 所接受的匹配属性相同。它也可以是字符串或字符串数组作为 `{ path }` 的快捷方式:
+
+```javascript
+{
+    path, // like /users/:id; either a single string or an array of strings
+    strict, // optional, defaults to false
+    exact, // optional, defaults to false
+}
+```
+
+### returns
+
+当前 pathname 与路径属性匹配时, 返回一个对象.
+
+```javascript
+matchPath("/users/2", {
+    path: "/users/:id",
+    exact: true,
+    strict: true,
+});
+
+//  {
+//    isExact: true
+//    params: {
+//        id: "2"
+//    }
+//    path: "/users/:id"
+//    url: "/users/2"
+//  }
+```
+
+当 pathname 与路径属性不匹配时, 返回 null
+
+```javascript
+matchPath("/users", {
+    path: "/users/:id",
+    exact: true,
+    strict: true,
+});
+
+//  null
+```
+
+## withRouter
+
+您可以通过 withRouter 高阶组件访问历史对象的属性和最近路由的匹配。当被包装的组件呈现时，withRouter 会将更新的 match, position 和 history 属性传递给它。
+
+```javascript
+import React from "react";
+import PropTypes from "prop-types";
+import { withRouter } from "react-router";
+
+// A simple component that shows the pathname of the current location
+class ShowTheLocation extends React.Component {
+    static propTypes = {
+        match: PropTypes.object.isRequired,
+        location: PropTypes.object.isRequired,
+        history: PropTypes.object.isRequired,
+    };
+
+    render() {
+        const { match, location, history } = this.props;
+
+        return <div>You are now at {location.pathname}</div>;
+    }
+}
+
+// Create a new component that is "connected" (to borrow redux
+// terminology) to the router.
+const ShowTheLocationWithRouter = withRouter(ShowTheLocation);
+```
+
+重要提示
+
+withRouter 不会像 React Redux 的 connect 订阅状态更改那样订阅位置更改。相反，在位置变化从路由器组件传播出去后重新呈现。这意味着 withRouter 不会在路由转换上重新渲染，除非它的父组件重新渲染。
+
+静态方法和属性
+
+包装组件的所有非响应特定静态方法和属性将自动复制到 "连接的" 组件。
+
+### Component.WrappedComponent
+
+被包装的组件公开为返回组件上的静态属性 WrappedComponent，它可用于隔离地测试组件。
+
+```javascript
+// MyComponent.js
+export default withRouter(MyComponent)
+
+// MyComponent.test.js
+import MyComponent from './MyComponent'
+render(<MyComponent.WrappedComponent location={{...}} ... />)
+```
+
+### wrappedComponentRef: func
+
+将作为 ref 属性传递给包装组件的函数。
+
+```javascript
+class Container extends React.Component {
+    componentDidMount() {
+        this.component.doSomething();
+    }
+
+    render() {
+        return <MyComponent wrappedComponentRef={(c) => (this.component = c)} />;
+    }
+}
+```
