@@ -8,6 +8,8 @@ import App from "./App";
 // import NetClientApp from "./demo/NetClientApp";
 // import InfiniteDivApp from "./demo/InfiniteDivApp";
 // import ReactScrollApp from "./demo/ReactScrollApp";
+// import ReduxApp from "./demo/ReduxApp";
+// import ReduxTODOApp from "./demo/ReduxTODOApp";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter } from "react-router-dom";
 
@@ -16,6 +18,8 @@ ReactDOM.render(
     <BrowserRouter>
         <App />
     </BrowserRouter>,
+    // <ReduxApp />,
+    // <ReduxTODOApp />,
     // <RouterApp />,
     // <NetClientApp />,
     // <SocketIOApp />,
