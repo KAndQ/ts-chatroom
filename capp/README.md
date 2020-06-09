@@ -4,7 +4,7 @@
 
 -   React
 -   Ant Design
--   React Redux(还未引入)
+-   React Redux, *原来认为可以渐进式引入, 可是要修改很多, 只用来学习, 保持原来的结构*
 -   [React Router](./doc/react-router/README.md)
 -   Socket.IO
 
