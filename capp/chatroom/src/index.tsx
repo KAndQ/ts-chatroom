@@ -10,6 +10,7 @@ import App from "./App";
 // import ReactScrollApp from "./demo/ReactScrollApp";
 // import ReduxApp from "./demo/ReduxApp";
 // import ReduxTODOApp from "./demo/ReduxTODOApp";
+// import ReduxAsyncApp from "./demo/ReduxAsyncApp";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter } from "react-router-dom";
 
@@ -18,6 +19,8 @@ ReactDOM.render(
     <BrowserRouter>
         <App />
     </BrowserRouter>,
+
+    // <ReduxAsyncApp />,
     // <ReduxApp />,
     // <ReduxTODOApp />,
     // <RouterApp />,
