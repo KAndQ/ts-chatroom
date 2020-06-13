@@ -10,7 +10,7 @@ import { EVENT_RECV_DATA } from "../core/Events";
 import IClient from "../interface/IClient";
 import Dev from "../utils/Dev";
 
-const HEAD_SIZE = 4;
+let HEAD_SIZE = 2;
 let gen_id = 0;
 
 export default class Client implements IClient {
@@ -47,6 +47,7 @@ export default class Client implements IClient {
             }
         });
         this.m_socket.on("data", (data) => {
+            console.log("==>> recv data");
             this.decode(data);
         });
         this.m_socket.on("error", (err) => {
@@ -59,7 +60,11 @@ export default class Client implements IClient {
 
     public encodeSend(data: Buffer): void {
         let headBuf = Buffer.alloc(HEAD_SIZE);
-        headBuf.writeUInt32BE(data.length);
+        if (HEAD_SIZE === 2) {
+            headBuf.writeUInt16BE(data.length);
+        } else if (HEAD_SIZE === 4) {
+            headBuf.writeUInt32BE(data.length);
+        }
         this.m_socket.write(Buffer.concat([headBuf, data]));
     }
 
@@ -80,7 +85,11 @@ export default class Client implements IClient {
 
         while (this.m_buffer.length >= this.m_readSize) {
             if (this.m_isReadHead) {
-                this.m_readSize = this.m_buffer.readUInt32BE();
+                if (HEAD_SIZE === 2) {
+                    this.m_readSize = this.m_buffer.readUInt16BE();
+                } else if (HEAD_SIZE === 4) {
+                    this.m_readSize = this.m_buffer.readUInt32BE();
+                }
                 this.m_isReadHead = false;
                 this.m_buffer = this.m_buffer.slice(HEAD_SIZE);
             } else {
