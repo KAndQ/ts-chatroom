@@ -39,6 +39,12 @@ export class Core extends EventEmitter {
             Dev.print("Core", `name = ${this.m_defaultName}, password = ${this.m_defaultPassword}`);
         }
 
+        // build path
+        if (urlObj.path && urlObj.path.indexOf("build/")) {
+            Dev.print("Core", urlObj.path);
+            this.m_isBuildPath = true;
+        }
+
         this.m_client = new NetClient();
         this.m_store = store;
         this.m_chatUserCache = new ChatUserCache();
@@ -64,12 +70,17 @@ export class Core extends EventEmitter {
         return this.m_chatUserCache;
     }
 
+    public get isBuildPath(): boolean {
+        return this.m_isBuildPath;
+    }
+
     private static s_instance?: Core;
     private m_defaultName?: string;
     private m_defaultPassword?: string;
     private m_client: NetClient;
     private m_store: Store;
     private m_chatUserCache: ChatUserCache;
+    private m_isBuildPath: boolean = false;
 }
 
 const core = Core.getInstance();

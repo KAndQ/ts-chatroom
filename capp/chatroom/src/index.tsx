@@ -13,10 +13,11 @@ import App from "./App";
 // import ReduxAsyncApp from "./demo/ReduxAsyncApp";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter } from "react-router-dom";
+import core from "./model/Core";
 
 ReactDOM.render(
     // <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={core.isBuildPath ? "/chatroom/build" : undefined}>
         <App />
     </BrowserRouter>,
 
