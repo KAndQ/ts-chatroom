@@ -66,7 +66,7 @@ export default class ChatRoomMessages extends Component<any, IState> {
         this.state.messages.forEach((v, index) => {
             messageDivs.push(
                 <div
-                    key={index}
+                    key={v.mid}
                     style={{
                         width: "100%",
                         display: "flex",
